@@ -73,10 +73,18 @@ def test_every_row_gets_a_category(df):
 
 
 def test_uncategorized_share_stays_within_documented_bounds(df):
-    # Documented in the About section as ~19%. A large move means the rules
-    # changed materially and the documentation needs updating with them.
+    # Documented in the About section as ~12%. A large move means the rules
+    # changed materially and the documentation needs updating with them --
+    # which is exactly how this bound earned its keep: expanding the keyword
+    # set dropped the share from 18.4% to 11.9% and failed this test, rather
+    # than letting the docs quietly go stale.
     share = (df["category"] == "Uncategorized").mean()
-    assert 0.15 <= share <= 0.25
+    assert 0.08 <= share <= 0.16
+
+
+def test_uncategorized_is_no_longer_the_largest_category(df):
+    counts = df["category"].value_counts()
+    assert counts.idxmax() != "Uncategorized"
 
 
 def test_reason_tagging_covers_most_recalls(df):

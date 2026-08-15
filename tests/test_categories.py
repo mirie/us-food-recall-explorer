@@ -76,3 +76,46 @@ def test_chicken_flavouring_is_not_a_poultry_recall():
     assert assign_category(
         "Natural Chicken Flavor Seasoning, Net Weight 50 lbs"
     ) == "Spices/Condiments"
+
+
+# --- Coverage gaps found by inspecting the Uncategorized bucket --------------
+# All strings below are real (lightly trimmed) rows that fell through the first
+# rule set. Two whole categories were missing; the rest were absent keywords.
+
+def test_breakfast_cereal_gets_the_grains_category():
+    assert assign_category(
+        "Kellogg's Frosted Mini Wheats, Bite Size, Whole Grain Wheat Cereal"
+    ) == "Grains/Cereal"
+
+
+def test_grits_are_grains():
+    assert assign_category("White quick grits packaged in a paper bag") == "Grains/Cereal"
+
+
+def test_bulk_cooking_oil_gets_the_oils_category():
+    assert assign_category("Oasis Foods Soybean Oil, Net Wt. 35 LB") == "Oils/Fats"
+
+
+def test_oil_as_an_ingredient_does_not_beat_product_form():
+    # Oils/Fats sits in tier 3 for the same reason Dairy does.
+    assert assign_category("Sardines packed in olive oil, 4 oz tin") == "Seafood"
+
+
+def test_mushrooms_are_produce():
+    assert assign_category("Utopia brand Enoki Mushroom, 200g") == "Produce"
+
+
+def test_herring_is_seafood():
+    assert assign_category("MA Cohen's Kippered Herring, vacuum packed") == "Seafood"
+
+
+def test_seed_kernels_are_nuts_and_seeds():
+    assert assign_category("Southern Grove Roasted & Unsalted Sunflower Kernels") == "Nuts/Seeds"
+
+
+def test_whole_spices_are_spices():
+    assert assign_category("Cardamom Pods Green Whole Organic, 25 lb bulk") == "Spices/Condiments"
+
+
+def test_tofu_gets_the_plant_protein_category():
+    assert assign_category("Gourmet Firm Tofu, retail vacuum pack, net wt 7 oz") == "Plant Protein"
