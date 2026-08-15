@@ -38,3 +38,41 @@ def test_missing_description_is_uncategorized_not_an_error():
 
 def test_matching_is_case_insensitive():
     assert assign_category("FRESH ROMAINE LETTUCE") == "Produce"
+
+
+# --- Meat words are ingredient words in this dataset -------------------------
+# FDA does not regulate meat, poultry, or processed egg products -- USDA FSIS
+# does, in a separate dataset. So essentially every meat keyword in this corpus
+# is a flavour or ingredient mention inside an FDA-regulated processed food,
+# not a meat recall. Meat categories therefore rank BELOW product-form
+# categories, exactly as Dairy does.
+
+def test_bacon_in_a_candy_product_is_not_a_pork_recall():
+    assert assign_category("Bacon Brittle, 2 lbs, bulk plastic bags") == "Snacks/Candy"
+
+
+def test_beef_in_a_prepared_meal_is_not_a_beef_recall():
+    assert assign_category("#380 2 lb Hearty Mac & Beef") == "Prepared/Frozen"
+
+
+def test_egg_in_an_ingredient_list_is_not_an_egg_recall():
+    assert assign_category(
+        "Pineapple Pies, 24 count, ingredients include egg"
+    ) == "Bakery"
+
+
+def test_plural_product_forms_still_match():
+    # Regression: the Bakery rule was `\bpie\b`, which missed "pies" entirely
+    # and let the row fall through to a lower tier.
+    assert assign_category("Cherry Pies, 24 count") == "Bakery"
+
+
+def test_produce_keywords_do_not_match_inside_longer_words():
+    # Regression: bare `apple` also matched "pineapple".
+    assert assign_category("Pineapple upside down cake") == "Bakery"
+
+
+def test_chicken_flavouring_is_not_a_poultry_recall():
+    assert assign_category(
+        "Natural Chicken Flavor Seasoning, Net Weight 50 lbs"
+    ) == "Spices/Condiments"

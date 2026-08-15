@@ -29,35 +29,45 @@ UNCATEGORIZED = "Uncategorized"
 
 # Order is load-bearing -- first match wins. See module docstring.
 CATEGORY_RULES = [
-    # Narrow and unambiguous: these words name a product, not an ingredient.
+    # Tier 1 -- narrow, and these words genuinely name a product here.
     ("Supplements", r"supplement|vitamin|capsule|softgel|dietary|herbal|"
                     r"kratom|infant formula|probiotic|protein powder"),
     ("Seafood", r"fish|salmon|tuna|shrimp|oyster|clam|crab|lobster|scallop|"
                 r"seafood|tilapia|anchov|squid|mussel|cod fillet|sardine"),
-    ("Beef", r"\bbeef\b|steak|hamburger|\bveal\b|brisket"),
-    ("Pork", r"\bpork\b|bacon|\bham\b|sausage|salami|prosciutto|mortadella|chorizo"),
-    ("Poultry/Eggs", r"chicken|turkey|poultry|\begg\b|\beggs\b|\bduck\b"),
 
-    # Product-form categories: these beat ingredient words below them.
+    # Tier 2 -- product form. What the item *is*, which beats what it contains.
     ("Bakery", r"bread|cake|cookie|pastr|muffin|bakery|donut|doughnut|brownie|"
-               r"cracker|tortilla|bagel|macaron|\bpie\b|biscuit|croissant"),
+               r"cracker|tortilla|bagel|macaron|\bpies?\b|biscuit|croissant"),
     ("Prepared/Frozen", r"frozen|entree|burrito|pizza|soup|sandwich|sushi|"
-                        r"noodle|pasta|lasagna|\bwrap\b|casserole"),
+                        r"noodle|pasta|lasagna|\bwrap\b|casserole|mac &|"
+                        r"macaroni"),
     ("Beverages", r"juice|beverage|soda|\btea\b|coffee|smoothie|kombucha|"
                   r"drink|water\b"),
     ("Snacks/Candy", r"candy|chocolate|chip|snack|popcorn|pretzel|granola|"
-                     r"fudge|gummy|caramel"),
+                     r"fudge|gummy|caramel|brittle"),
 
-    # Broad, and their keywords double as ingredients -- last resort only.
+    # Tier 3 -- keywords that double as ingredients. Last resort only.
+    #
+    # Meat sits here, not in tier 1, and the reason is jurisdictional: FDA does
+    # not regulate meat, poultry, or processed egg products. USDA FSIS does, in
+    # a separate dataset. So a meat word in THIS corpus is almost always a
+    # flavouring or ingredient inside an FDA-regulated processed food --
+    # "Natural Beef Flavor", "Bacon Brittle", "Chicken Flavor Seasoning". These
+    # categories are kept so genuine FDA-jurisdiction items still land
+    # somewhere, but they must not outrank product form.
+    # \bapple matters: without the boundary it also matches "pineapple".
     ("Produce", r"lettuce|spinach|salad|romaine|cucumber|tomato|onion|melon|"
-                r"cantaloupe|berr|apple|peach|mango|sprout|carrot|celery|"
-                r"avocado|papaya|broccoli|cauliflower|potato|squash|kale|"
-                r"cilantro|parsley|fruit|vegetable"),
+                r"cantaloupe|berr|\bapples?\b|peach|mango|sprout|carrot|"
+                r"celery|avocado|papaya|broccoli|cauliflower|potato|squash|"
+                r"kale|cilantro|parsley|fruit|vegetable"),
     ("Dairy", r"milk|cheese|yogurt|butter|cream|dairy|queso|brie"),
     ("Nuts/Seeds", r"peanut|almond|cashew|walnut|pecan|pistachio|\bnuts?\b|"
                    r"sesame|chia|flax"),
     ("Spices/Condiments", r"spice|season|sauce|dressing|salsa|hummus|mustard|"
-                          r"mayonnais|ketchup|syrup|honey|vinegar"),
+                          r"mayonnais|ketchup|syrup|honey|vinegar|flavor"),
+    ("Beef", r"\bbeef\b|steak|hamburger|\bveal\b|brisket"),
+    ("Pork", r"\bpork\b|bacon|\bham\b|sausage|salami|prosciutto|mortadella|chorizo"),
+    ("Poultry/Eggs", r"chicken|turkey|poultry|\begg\b|\beggs\b|\bduck\b"),
 ]
 
 
