@@ -161,3 +161,26 @@ Worth logging as a prompt: it is the first time in the project that the *human* 
 
 
 
+
+## Tool: Claude Code — adopting a testing strategy mid-build
+
+> "I think I failed to mention earlier that I'd like to take a test-driven approach as part of implementation. Now that we have the data, I want you to make sure you are writing tests: 1. Unit Tests (TDD) — write tests first, then implement, for all pure logic... use small, hand-built DataFrames/dicts as input fixtures — do not read the real file in these tests... 2. Pipeline / E2E Tests — run the actual fixed CSV file through the full real pipeline... 3. One Guardrail Test — validates the CSV's expected schema... **Explicitly Skip**: no integration tests as a separate tier... no malformed/adversarial input handling — the file is fixed and controlled, not user-uploaded... no retry logic, upload validation, or encoding-detection tests."
+>
+> "Testing Interactive Visualizations... Split Data Shaping from Rendering: `raw data → [transform_for_chart()] → chart-ready data → [render component]`... Do not unit test the rendering output itself (e.g., asserting SVG bar heights) — brittle, breaks on styling changes, low signal... Visual Correctness Stays Manual."
+
+Result: the most consequential prompt of the build phase, and notable for what it *excludes*. The skip list is doing as much work as the requirements — it rules out an entire tier of tests that would have looked responsible and produced nothing, because the input file is fixed and controlled rather than user-supplied. The explicit "don't assert on rendered output" line pre-empts the most common way chart test suites become maintenance burdens.
+
+The instruction to use hand-built fixtures for unit logic, and the real file *only* at the pipeline tier, is what kept the unit suite at ~0.02s — fast enough to run after every single edit, which is what made strict red-green-refactor practical rather than theoretical.
+
+> "Also please commit iteratively, rather than one massive commit"
+
+Result: sent mid-turn, while a slice was in progress. Changed the commit cadence from one Phase-1 commit to one per green slice, so the history records the meat-category bug and its fix as a distinct, inspectable step rather than burying it inside a larger diff.
+
+## Tool: Claude Code — Phase 1 decision points
+
+> **Category resolution** — asked after measuring that 35.4% of descriptions match two or more categories, with the collision table showing Dairy colliding with everything. → *Precedence, specific beats generic.* The framing that made the decision answerable was identifying **why** the collisions happen: `milk`, `butter`, and `cream` are ingredient words, not product-type words, so a chocolate chip cookie matches Dairy, Bakery, and Snacks at once. The accepted tradeoff — "ice cream sandwich" resolving to Bakery — was shown in the option preview rather than discovered later.
+
+> **Reason labelling** — → *Multi-label.* Measured afterwards at only 1.7% of recalls carrying two or more tags, making the choice semantically right but practically minor. Worth recording that the decision was made on principle and the data later showed the stakes were low; the reverse (deciding on principle and discovering the stakes were high) is the case this habit is insurance against.
+
+> **Meat categories** — surfaced after inspecting what actually landed in Beef/Pork/Poultry and finding `Natural Beef Flavor`, `Bacon Brittle`, and `MME Chicken Parmesan No Meat`. → *Demote below product form*, and *build the top-foods chart to real data, documenting the wireframe divergence.* The underlying fact — FDA does not regulate meat, poultry, or processed egg products, USDA FSIS does — was not in the PRD, the wireframe, or any planning document, and it invalidates three of the wireframe's eight top-foods bars.
+

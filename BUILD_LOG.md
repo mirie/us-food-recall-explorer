@@ -214,3 +214,63 @@ Two rows carry a blank `recall_number` (both mid-2026, presumably not yet assign
 
 ---
 
+
+## Entry 2 — Phase 1: Data Preparation (test-driven)
+
+**Goal**
+Turn the raw snapshot into an analysis-ready DataFrame — food category, contamination reason, clean dates, and the two aggregation lenses — with a test suite underneath it, after adopting a formal testing strategy mid-build.
+
+**What I built**
+- A three-tier test suite, per the strategy set out this session: strict TDD unit tests on pure logic with hand-built fixtures; one end-to-end pipeline test against the real CSV; one schema guardrail.
+- `recall_explorer/categories.py` — priority-ordered keyword rules, first match wins.
+- `recall_explorer/reasons.py` — multi-label contamination tagging.
+- `recall_explorer/transforms.py` — date parsing plus `count_by(df, dimension, lens)`, the event/product lenses.
+- `recall_explorer/schema.py` — expected columns, row floor, non-null requirements.
+- `recall_explorer/pipeline.py` — the only module that touches the filesystem.
+- 44 tests passing.
+
+**What worked**
+- Deciding the design questions *before* writing tests. Under TDD the test is the spec, so a guessed precedence order would have been silently frozen into assertions. Both category precedence and multi-label-vs-single were settled first, then encoded.
+- Keeping every unit test on hand-built fixtures made the suite run in ~0.02s, so it could be run after every single change without friction.
+- Asserting ranges rather than exact values for keyword-derived shares. Tightening a rule moves `Uncategorized` by a fraction of a percent; that should not break the build, while a jump from 18% to 40% should.
+- Writing a test that asserts the two lenses **disagree**. That is the app's entire premise, and it is the kind of thing that could regress into "both call `.size()`" without anyone noticing.
+
+**What broke**
+
+1. **A date that parses successfully but is absurd.** openFDA's `"02121207"` parses cleanly as **7 December, year 212** — so `errors="coerce"` never fires. Under pandas 2.x this was caught for free, because `datetime64[ns]` cannot represent years before 1677 and coerced it to `NaT`. Under pandas 3.0's `datetime64[us]` it survives as a real Timestamp and would have dragged the trend chart's x-axis back eighteen centuries. The plausibility window is now explicit rather than inherited from a dtype limit. Directly caught by the test written before the code.
+
+2. **Meat categories were ranked on a false premise — mine.** I placed Beef/Pork/Poultry in the top tier reasoning that those words name products rather than ingredients. They do not, *in this dataset*, because **FDA does not regulate meat, poultry, or processed egg products — USDA FSIS does**, in an entirely separate system. Nearly every meat keyword here is a flavouring or ingredient inside an FDA-regulated processed food: `Natural Beef Flavor`, `Bacon Brittle`, `Cheddar Bacon Skins`, `Chicken Flavor Seasoning`, and a `Pineapple Pie` matching on egg in its ingredient list. One row reads `MME Chicken Parmesan No Meat` and was classified Poultry/Eggs. This is the *same* ingredient-vs-product-type error I had already diagnosed for Dairy and explicitly designed the ladder to prevent — reproduced one tier up, in the same commit.
+
+3. **Two regex bugs, both surfaced by a single failing test.** `Bakery` matched `\bpie\b`, which does not match the plural "pies", so a pie row fell through a tier — landing in `Produce`, because the bare pattern `apple` also matches inside **"pineapple"**. Neither would have thrown; both would have quietly misfiled rows forever.
+
+4. **A TDD discipline lapse, self-reported.** In the second GREEN step I wrote all thirteen category rules when the failing test required one. `CATEGORY_RULES` is closer to a data table than to logic, but the honest description is that I over-implemented. The subsequent category tests therefore lock behavior rather than drive it. They are still real tests — reordering the ladder fails them, which I verified by actually promoting Dairy and watching the assertion break — but they are not what red-green-refactor is supposed to produce.
+
+**What I changed**
+- Meat categories demoted from tier 1 to tier 3, below product form. Combined meat share drops from 2,079 rows (7.1%) to 459 (1.6%) — the truthful picture rather than three misleading bars.
+- `\bpie\b` → `\bpies?\b`; bare `apple` → `\bapples?\b`. Both have named regression tests.
+- Explicit date plausibility window (2000–2100) in `parse_recall_dates`.
+- Decisions taken this phase:
+  1. **Category = priority-ordered, specific beats generic.** Accepted misfire: "ice cream sandwich" resolves to Bakery, not Dairy. Surfaced in "About the data" rather than hidden.
+  2. **Reasons are multi-label.** Empirically this matters less than expected — only 499 rows (1.7%) carry two or more tags, averaging 1.02. Still the right semantic choice, but the "percentages won't sum to 100%" caveat is far smaller in practice than in principle.
+  3. **The wireframe's top-foods chart is not achievable.** It ranks Poultry #1, Beef #3, Pork #4. Building to real data and documenting the divergence, consistent with how the 2004-axis divergence was handled.
+
+**Measured output (29,161 rows)**
+
+```
+Uncategorized 18.4%   Produce 15.4%   Bakery 14.3%   Dairy 9.2%
+Snacks 8.8%   Seafood 8.1%   Prepared/Frozen 7.3%   Supplements 5.7%
+Spices 4.9%   Beverages 4.0%   Nuts 2.5%   Poultry 0.9%   Pork 0.4%   Beef 0.3%
+
+Reason tagging: 84.3% tagged, 15.7% untagged, 1.02 tags per tagged recall
+Top reasons: Undeclared allergen 28.4% | Listeria 25.6% | Salmonella 12.4%
+```
+
+**Open questions carried into Phase 2**
+- `Uncategorized` at 18.4% is the second-largest bar. Shown honestly as decided, but worth a look on screen — it may dominate the chart visually in a way that reads as a defect rather than as candour.
+- The partial-2026 dip still needs a visual treatment decision (dashed segment vs. annotation vs. excluding the year from the trend line).
+- Seasonality has not been built yet; the month distribution has not been examined at all.
+
+**Time spent**
+~1 session, interleaved with the testing-strategy adoption.
+
+---
