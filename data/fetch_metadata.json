@@ -1,0 +1,52 @@
+{
+  "script_version": "1.0",
+  "fetched_at_utc": "2026-08-15T00:05:31+00:00",
+  "openfda_last_updated": "2026-08-05",
+  "source_url": "https://api.fda.gov/food/enforcement.json",
+  "date_field": "recall_initiation_date",
+  "year_range": [
+    2012,
+    2026
+  ],
+  "total_rows": 29161,
+  "unique_event_ids": 7791,
+  "rows_per_year": {
+    "2012": 2151,
+    "2013": 2420,
+    "2014": 2451,
+    "2015": 2750,
+    "2016": 3066,
+    "2017": 2623,
+    "2018": 1977,
+    "2019": 1807,
+    "2020": 1117,
+    "2021": 1501,
+    "2022": 1427,
+    "2023": 2221,
+    "2024": 1387,
+    "2025": 1571,
+    "2026": 692
+  },
+  "limit_applied": null,
+  "columns": [
+    "recall_number",
+    "event_id",
+    "product_type",
+    "status",
+    "classification",
+    "product_description",
+    "reason_for_recall",
+    "product_quantity",
+    "recalling_firm",
+    "city",
+    "state",
+    "country",
+    "voluntary_mandated",
+    "initial_firm_notification",
+    "distribution_pattern",
+    "recall_initiation_date",
+    "center_classification_date",
+    "report_date",
+    "termination_date"
+  ]
+}
