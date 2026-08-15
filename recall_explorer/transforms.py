@@ -43,6 +43,59 @@ def parse_recall_dates(df):
     return out
 
 
+def _validate_lens(lens):
+    if lens not in LENSES:
+        raise ValueError(f"lens must be one of {LENSES}, got {lens!r}")
+
+
+def seasonality_matrix(df, lens, coverage_end=None):
+    """Long-form (year, month) grid of recall counts, for the seasonality heatmap.
+
+    Returns every (year, month) cell across the full span of years present in
+    `df`, not just the months that happen to have data -- a calendar grid with
+    holes would be indistinguishable from a coding error.
+
+    `covered` distinguishes two different kinds of blank cell:
+
+      count=0, covered=True   -- a real zero: this month is within the
+                                  snapshot's coverage and simply had no
+                                  matching recalls.
+      count=NA, covered=False -- not yet observed: this month is beyond
+                                  `coverage_end` (e.g. next month, which
+                                  hasn't happened).
+
+    `coverage_end` is an explicit (year, month) tuple. It exists because the
+    caller's date of last observation is not always the last row in `df` --
+    reporting lag can leave a covered month with zero rows so far, and a
+    filtered subset of `df` can end earlier than the full dataset's true
+    coverage. Defaults to the last (year, month) present in `df`.
+    """
+    _validate_lens(lens)
+
+    if coverage_end is None:
+        coverage_end = (int(df["year"].max()), int(df["month"].max()))
+    coverage_end_key = coverage_end[0] * 12 + coverage_end[1]
+
+    if lens == EVENTS:
+        counted = df.groupby(["year", "month"])["event_id"].nunique()
+    else:
+        counted = df.groupby(["year", "month"]).size()
+    counted = counted.rename("count")
+
+    years = range(int(df["year"].min()), int(df["year"].max()) + 1)
+    grid = pd.DataFrame(
+        [(year, month) for year in years for month in range(1, 13)],
+        columns=["year", "month"],
+    )
+
+    grid = grid.merge(counted.reset_index(), on=["year", "month"], how="left")
+    grid["covered"] = (grid["year"] * 12 + grid["month"]) <= coverage_end_key
+    grid.loc[grid["covered"], "count"] = grid.loc[grid["covered"], "count"].fillna(0)
+    grid.loc[~grid["covered"], "count"] = pd.NA
+
+    return grid.sort_values(["year", "month"], ignore_index=True)
+
+
 def count_by(df, dimension, lens):
     """Count recalls grouped by `dimension`, under one of the two lenses.
 
@@ -59,8 +112,7 @@ def count_by(df, dimension, lens):
 
     Returns a DataFrame of [dimension, count], descending by count.
     """
-    if lens not in LENSES:
-        raise ValueError(f"lens must be one of {LENSES}, got {lens!r}")
+    _validate_lens(lens)
 
     if lens == EVENTS:
         counted = df.groupby(dimension)["event_id"].nunique()
