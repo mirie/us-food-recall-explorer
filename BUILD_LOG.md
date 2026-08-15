@@ -388,6 +388,6 @@ Dropped the partial-year caption I'd planned for the seasonality section, and re
 - Whether the year-to-year rotation in the heatmap reads as rotation (rather than noise) at production cell size is a manual design-review question, not yet asked of a human viewer at full resolution.
 
 **Time spent**
-~1 session: data exploration, TDD for the transform, chart + smoke test, app shell, and headless-browser verification.
+~1.5 hours reading `HANDOFF_PHASE2.md` and the PRD, examining the month distribution, and reaching the plan (brainstorming + plan mode) — then ~10 minutes once the plan was approved: TDD for the transform, the chart + smoke test, and the app shell. The gap is the point, not a curiosity — see `LEARNINGS.md`'s new entry on where session cost actually goes.
 
 ---
