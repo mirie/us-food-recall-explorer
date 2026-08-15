@@ -95,30 +95,43 @@ correctness is a manual design review — this session used a headless-Chrome
 + CDP screenshot to do that (see Slice 1's build log entry for the recipe;
 `chromium-cli` wasn't available in this environment).
 
-## Suggested order and what's new per slice
+## Two design questions, decided with Mai before this doc was handed off
 
-**Top recalled foods first — it needs no new transform.** `count_by(df,
-"category", lens)` already exists and already returns exactly what a
-horizontal bar chart needs (dimension + count, sorted descending). This
-slice is close to chart-only: `top_foods_bar()` in `charts.py`, wired into
-`app.py`'s existing placeholder. The open question carried from
-`HANDOFF_PHASE2.md`: **17 categories may be too many for a readable bar
-chart** — decide whether to collapse the tail into a display-only "Other"
-(keeping `df["category"]` itself untouched) before or after seeing it
-rendered. `Uncategorized` stays visible regardless (locked decision #6).
+**Trend chart: three lines by severity, not one total line.** Confirmed with
+a concrete preview built from the real yearly numbers above. The reasoning
+that settled it: a single total line hides *why* 2016 spiked (799 events vs.
+~550-600 neighbors) — it was Class I roughly doubling (266→415), not all
+three severities rising together, which is exactly the "gradual increase vs.
+cyclical vs. rise-then-fall" distinction the PRD's analyst persona asks for.
+Same three colors (Class I / II / III) in both the event-lens and
+product-lens panels. Class II is consistently the largest and flattest line;
+Class I is the volatile one, including the 2016 peak; Class III stays thin
+near the bottom throughout — useful to know going in, not something to
+re-derive.
 
-**Trend-over-time second — this one needs both a transform and the dashed-
-segment chart logic.** Shape the transform as year x count (or year x
-severity x count, if the line chart splits by Class I/II/III — the PRD says
-"volume/severity," which is genuinely ambiguous between "one line, total
-volume" and "three lines, one per severity class"; look at the severity-by-
-year numbers above before deciding, and treat it as a real design question
-worth a quick check-in rather than a guess to freeze into passing tests, the
-way seasonality's chart shape was decided last session). The dashed-segment
+**Top-foods chart: all 17 categories, no "Other" bucket.** Simplest option,
+deliberately — Mai's reasoning: category assignment is already known-lossy
+(frozen regex ladder, ~12% Uncategorized, unmeasured accuracy on the rest,
+see `HANDOFF_PHASE2.md`'s known limitations) and Phase 3's LLM pass is
+expected to change both the category set and the numbers, so a display-only
+collapsing scheme would likely need rework anyway. Don't build it now.
+`Uncategorized` stays visible per locked decision #6 regardless.
+
+## What's new per slice, given those decisions
+
+**Top recalled foods — no new transform needed.** `count_by(df, "category",
+lens)` already exists and already returns exactly what a horizontal bar
+chart needs (dimension + count, sorted descending). This slice is
+chart-only: `top_foods_bar()` in `charts.py`, wired into `app.py`'s existing
+placeholder, all 17 categories rendered as-is.
+
+**Trend-over-time — needs a new transform and the dashed-segment chart
+logic.** Shape the transform as year x classification x count (three rows
+per year, one per severity class, under each lens). The dashed-segment
 requirement (decision #9 above) is the main implementation risk — Altair
 supports this via a `strokeDash` encoding conditioned on a `partial: bool`
-column the transform should emit, following the same shape `seasonality_matrix()`
-used for `covered`.
+column the transform should emit, following the same shape
+`seasonality_matrix()` used for `covered`.
 
 ## Deferred to Phase 3
 
