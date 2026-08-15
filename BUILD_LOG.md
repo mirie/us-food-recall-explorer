@@ -360,3 +360,34 @@ Poultry 0.7%  Pork 0.3%  Beef 0.2%  Plant Protein 0.2%  Oils/Fats 0.2%
 ~1 session, entirely reactive to a single challenge on a single word.
 
 ---
+
+## Entry 3 — Phase 2, Slice 1: App Shell + Seasonality Heatmap
+
+**Goal**
+Start Phase 2. Seasonality was flagged in the handoff as the only one of the three core questions with a genuinely unknown answer — start there, and let what the data actually shows decide the chart shape rather than assuming a shape and fitting the data to it.
+
+**What I built**
+- Looked at the month distribution before writing any chart code. Aggregated across the 14 complete years (2012–2025), the spread is modest (events 1.42x, Jan low to Oct high; products 1.96x, Jan low to May high) — but the peak month rotates almost every year: Oct, Oct, Dec, Jan, May, Jun, Mar, Sep, Feb, May, May, Mar, Nov, Oct. Only May and Oct repeat, four times each in fourteen years. A 12-cell month-of-year strip would have asserted a stable season the data doesn't support.
+- `seasonality_matrix(df, lens, coverage_end=None)` in `transforms.py` — a long-form (year, month, count, covered) grid, TDD'd against hand-built fixtures (11 tests, all written and watched fail before implementation). `count_by()` couldn't be reused: it sorts by count and drops empty groups, both wrong for a calendar grid that needs every cell.
+- `seasonality_heatmap()` in a new `charts.py` — month x year heatmap, months in calendar order, years descending, independent single-hue colour scale per lens panel (events and products differ by ~3.7x; a shared scale would wash the smaller one out). Smoke-tested against real `load_recalls()` output per the testing contract.
+- `app.py` — the first page shell. Header, scope line, data-last-updated caption, Key Insights / Trend / Top-foods placeholders, a real About section with the six documented limitations, and the seasonality section live via `st.columns`.
+
+**What worked**
+- The `covered` flag on `seasonality_matrix()` earned its keep immediately. `coverage_end` is read from `fetch_metadata.json`'s `openfda_last_updated` (2026-08-05) rather than derived from `max(recall_date)` in the loaded frame — the last actual recall row is 2026-07-08, about four weeks earlier, which is openFDA's reporting lag, not missing coverage. Passing the metadata date means August 2026 renders as the real (currently low) count it is, not as an unobserved hole.
+- No `chromium-cli` in this environment, so I drove a headless Chrome instance directly over the DevTools Protocol (installed `websocket-client` into the scratchpad, not the project) to get a real post-hydration screenshot rather than trusting a `--screenshot`-flag capture, which only fires on the pre-hydration skeleton. Confirmed: both panels render with correct axis order and independent legends, 2026's Sep–Dec cells are blank against the page background, the About expander opens, and the browser console throws nothing.
+
+**What broke**
+Nothing in code. The one wrong assumption was caught before it shipped: I initially treated 2026 running through July as a data gap needing a dashed-segment annotation, following the PRD/handoff's "partial year" framing too literally. Mai corrected this — with today's date being 2026-08-14, a year that only reaches July is just the calendar, not missing data, and doesn't warrant emphasis on this chart (the PRD's dashed-segment rule is specifically about the trend line chart, not touched in this slice).
+
+**What I changed**
+Dropped the partial-year caption I'd planned for the seasonality section, and reframed `coverage_end`'s purpose in the plan from "handle the partial year" to "tell real zeros apart from not-yet-observed months" — which is what it actually does, and matters again as soon as Phase 3 filtering can end a subset's data earlier than the full dataset.
+
+**Open questions carried forward**
+- Trend-over-time and top-recalled-foods charts are still placeholders — next slices.
+- Key Insights row is still Phase 3, per the original phase plan.
+- Whether the year-to-year rotation in the heatmap reads as rotation (rather than noise) at production cell size is a manual design-review question, not yet asked of a human viewer at full resolution.
+
+**Time spent**
+~1 session: data exploration, TDD for the transform, chart + smoke test, app shell, and headless-browser verification.
+
+---
