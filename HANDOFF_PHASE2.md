@@ -1,5 +1,12 @@
 # Phase 2 Handoff — App Skeleton & Core Charts
 
+**Superseded on "what exists."** Phase 2 Slice 1 (seasonality) has since
+landed — `app.py`, `charts.py`, and `seasonality_matrix()` now exist. For
+current state and the two remaining chart slices, read
+`HANDOFF_PHASE2_SLICE2.md` instead. Kept here for the still-accurate data
+findings and locked decisions below, and as the historical record of what
+Phase 2 looked like before any of it was built.
+
 State as of the end of Phase 1. Read `US_Food_Recall_Explorer__Streamlit_Data_App___PRD.md` first, then `BUILD_LOG.md` Entries 1–2.5. This file is the short version.
 
 ## What exists and works
@@ -44,7 +51,7 @@ Severity: Class II 14,616  Class I 12,804  Class III 1,741
 2. **Chart type per data shape**: seasonality = heatmap/dot-matrix, trend = line, top foods = horizontal bar. Not bars everywhere.
 3. **Key Insights row**: 4 computed cards, rule-based, event-level framed. Never LLM-generated, never causal or evaluative.
 4. **One collapsible "About the data & limitations"**, not per-chart footnotes.
-5. **Partial 2026 is the single permitted exception to #4** — plot it as a dashed final segment labelled "partial year — through Aug 2026". Do not annualise or project; that invents data. Snapshot ends 2026-08-05, so 2026 plots 692 vs 2025's 1,571, a phantom 56% drop.
+5. **Partial 2026 is the single permitted exception to #4** — plot it as a dashed final segment labelled "partial year — through July 2026" (last actual `recall_initiation_date` is 2026-07-08; the 2026-08-05 figure elsewhere is openFDA's metadata/publication date, not the last recall in the data — don't use it for this label). Do not annualise or project; that invents data. 2026 plots 692 vs 2025's 1,571, a phantom 56% drop.
 6. **`Uncategorized` stays visible** in the top-foods chart. It is the only element that admits the category rules are rules.
 7. **Range is 2012–2026**, never 2004. The wireframe's `2004 —— 2026` axis is superseded.
 

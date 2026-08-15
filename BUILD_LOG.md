@@ -391,3 +391,30 @@ Dropped the partial-year caption I'd planned for the seasonality section, and re
 ~1.5 hours reading `HANDOFF_PHASE2.md` and the PRD, examining the month distribution, and reaching the plan (brainstorming + plan mode) — then ~10 minutes once the plan was approved: TDD for the transform, the chart + smoke test, and the app shell. The gap is the point, not a curiosity — see `LEARNINGS.md`'s new entry on where session cost actually goes.
 
 ---
+
+## Entry 3.5 — Handoff to Phase 2 Slice 2 (no code this entry)
+
+**Goal**
+Prepare for the next Phase 2 slice (trend-over-time, top recalled foods) with a proper handoff rather than jumping straight to Phase 3, and settle the two real design questions the handoff surfaced before they get frozen into code as guesses.
+
+**What I built**
+No code. `HANDOFF_PHASE2_SLICE2.md` — precomputed reference numbers (yearly event/product counts, severity by year, category rankings both lenses) so the next session doesn't re-derive them from the CSV.
+
+**What worked**
+- Caught prematurely jumping to Phase 3 before checking the PRD's own phase dependencies — trend-over-time and top-recalled-foods were still `st.info()` placeholders, and Phase 3 (filters) explicitly depends on all three charts existing.
+- An abstract framing of "should the trend line split by severity or stay one total line" got "this is too abstract for me" from Mai. Rebuilding it as two ASCII previews from the real 2016-spike numbers resolved it in one turn — see `LEARNINGS.md` for the general lesson.
+- Top-foods question (whether 17 categories needs a display-only "Other" bucket) resolved the same session, on different reasoning: Mai chose the simplest option deliberately, since the category set itself is expected to change once Phase 3's LLM labelling pass replaces the frozen regex ladder — not worth building a collapsing scheme for numbers that won't be the final numbers.
+
+**What broke**
+Found while writing the handoff, not by anyone flagging it: "partial year — through Aug 2026" had been written into the PRD (twice) and `HANDOFF_PHASE2.md` during planning, before real data existed to check it against. The actual last `recall_initiation_date` is 2026-07-08; 2026-08-05 is openFDA's metadata/publication timestamp, not the last recall date. Same shape as the Phase 0 2004-vs-2012 error — a plausible date, unchecked, propagating through multiple documents.
+
+**What I changed**
+Corrected the date in both PRD locations and `HANDOFF_PHASE2.md`; locked both design decisions (3-line severity split, no-"Other"-bucket) into `HANDOFF_PHASE2_SLICE2.md` so the next fresh session starts from decisions rather than open questions.
+
+**Open questions carried into Slice 2**
+None deliberately left open this time — both design questions specific to these two charts are settled. General open questions (Key Insights recompute-vs-debounce, filter interactions) remain Phase 3's, per `HANDOFF_PHASE2.md`.
+
+**Time spent**
+~20 minutes, entirely discussion and documentation.
+
+---

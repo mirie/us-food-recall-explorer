@@ -228,3 +228,31 @@ Result: forced the admission that **I had been reporting coverage as though it a
 
 Result: a scope reassessment prompted by accumulating evidence rather than by preference — five distinct regex failure classes by this point, four of them found by someone happening to inspect the right rows and two of those by Mai rather than by me. Decision was to **freeze the rules now and revisit in Phase 3** rather than either continuing to patch or pivoting mid-build. The deciding factor was architectural: `pipeline.py` sets `df["category"]` in one line, so swapping the source later costs no rework, which makes deferral genuinely cheap rather than merely postponed.
 
+## Tool: Claude Code — Phase 2 kickoff and Slice 1 (seasonality)
+
+> "Read HANDOFF_PHASE2.md, then US_Food_Recall_Explorer__Streamlit_Data_App___PRD.md. Start Phase 2 with the seasonality chart — TDD the transform first. Run .venv/bin/pytest before anything else."
+
+Result: the seasonality question turned out to have a real, non-obvious answer — the peak recall month rotates almost every year (only May and October repeat, four times each in fourteen years), so a month-of-year strip would have asserted a stable season the data doesn't support. Building a month x year heatmap instead of the wireframe's implied strip was a data-first decision, not a stylistic one.
+
+> "I accept this plan, but I don't want us to overindex on 2026 incompleteness as we have Jan - Aug 14 2026 data. It is Aug 14 2026 right now so there's no way we could have future recall data as that would not make any sense"
+
+Result: sent as an edit to an already-approved plan, mid-plan-mode. Caught a framing error before any code existed: the draft plan treated 2026 ending in July as a data defect needing a dashed-segment caption on the seasonality heatmap, following the PRD's "partial year" language too literally. It's just the calendar — today is 2026-08-14, so a year that only reaches July isn't missing anything. Reframed `coverage_end`'s purpose from "handle the partial year" to "tell real zeros apart from not-yet-observed months," which is what the parameter actually needed to do and matters again once Phase 3 filtering can end a subset's data earlier than the full dataset's.
+
+> "Wait is there a way to switch to a cheaper model before proceeding with the to dos?"
+
+Result: sent mid-turn, right after a plan was approved and before implementation started. No mechanism does this automatically — `/model` is a manual switch, run once, that then holds. Named as a habit to build at the plan-approval boundary specifically, since that's the point where the reasoning that produced the plan stops being load-bearing and a cheaper model can execute the plan file exactly as well.
+
+## Tool: Claude Code — session-cost review and Phase 2 Slice 2 handoff
+
+> "Note Phase 1 + prep for Phase 2: time spent is prob 1.5 hours. Phase 2 was very quick. Maybe 10 mins?" [pasting Claude's own usage breakdown] "...I need to switch from opus to sonnet after planning modes when executing the plan. I'm actually not sure how to do that effectively since Claude just continues on. I'm not sure how to clear the context more regularly for the same reason."
+
+Result: produced the split between ~1.5 hours of reading/analysis/planning and ~10 minutes of actual TDD-and-build once the plan was approved — corrected into `BUILD_LOG.md` Entry 3, which had originally logged the whole session as one vague "~1 session." The usage-breakdown question itself became a `LEARNINGS.md` entry: context-remaining and session-budget are different meters (54% of usage came from turns above 150k tokens, which the context-remaining number doesn't surface), and a heavy skill's cost is paid close to every time it's invoked (`test-driven-development` alone was 37% of the session).
+
+> "Looks like we are ready for Phase 3? If so, please prepare a handoff doc and prompt for me to use after I clear context"
+
+Result: caught before it happened — Phase 2 wasn't finished. Trend-over-time and top-recalled-foods were still placeholders, and Phase 3 (filters) explicitly depends on all three charts per the PRD's own phase ordering. Redirected to a Phase 2 Slice 2 handoff instead, with the two remaining chart slices' real design questions surfaced rather than deferred.
+
+> "this is too abstract for me. I think if there are 3 severities, I guess I lean away from a single line representing all, but I might be misunderstanding your question." [re: categories] "let's go with whatever is simplest since I know with the LLM assisted classification, the data and the categories are going to change."
+
+Result: two different resolutions, two different reasons, in the same message. The severity question needed a concrete rendering — an abstract description wasn't answerable, but two small ASCII previews built from the real 2016-spike numbers (Class I nearly doubling, not all three severities together) resolved it in one turn. The category question needed no visual at all — Mai's reasoning (categories are already known-lossy and about to be replaced by Phase 3's LLM pass) settled it directly: simplest option, no display-only "Other" bucket, don't invest in polishing numbers that won't be final.
+
