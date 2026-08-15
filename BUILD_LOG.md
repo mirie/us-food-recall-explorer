@@ -274,3 +274,45 @@ Top reasons: Undeclared allergen 28.4% | Listeria 25.6% | Salmonella 12.4%
 ~1 session, interleaved with the testing-strategy adoption.
 
 ---
+
+## Entry 2.5 — Category Coverage, Partial-Year Treatment & Phase 2 Handoff
+
+**Goal**
+Settle three open questions before starting Phase 2, rather than carrying them into UI work where they would be harder to change.
+
+**What I built**
+- Three new categories (Grains/Cereal, Plant Protein, Oils/Fats) and ~60 additional keywords, all TDD'd against real strings pulled from the Uncategorized bucket.
+- 54 tests passing.
+
+**What worked**
+- **Inspecting the bucket instead of reasoning about it.** I had characterised the residual 18.4% as irreducible ambiguity and estimated that expanding rules would hit diminishing returns. Sampling 25 rows refuted that immediately: `Kippered Herring`, `Enoki Mushroom`, `Sunflower Kernels`, `Cardamom Pods`, `Soybean Oil`, `grits`, `Tofu`, `Frosted Mini Wheats`. It was a coverage gap, not ambiguity — three categories were missing outright. Measured before committing to an approach: 41% of the bucket was recoverable, which turned a guess into a decision.
+- **A bound test failing on purpose.** Expanding the rules dropped Uncategorized from 18.4% to 11.9% and broke `test_uncategorized_share_stays_within_documented_bounds`. That is precisely the failure it exists to produce — it forced the documented figure to be updated alongside the code rather than silently going stale. Worth noting because it is the first test in this project to fail for a *good* reason.
+- Produce (17.0%) now leads the top-foods chart instead of Uncategorized, so the headline chart opens on a real category rather than on an absence.
+
+**What broke**
+- **I overstated a wireframe divergence.** I recorded that the PDF's top-foods chart was "not achievable" because it ranks Poultry #1. On challenge, that was wrong: the chart's *structure* — horizontal bars, top categories, both lenses — works exactly as drawn. Only its placeholder labels differ from real data, which is what a low-fidelity mock is for. I had conflated "the mock's illustrative content differs" (expected, unremarkable) with "the design doesn't work" (false). Corrected in the PRD. The real finding was always the USDA jurisdiction boundary, which is a property of the data source and belongs under Non-Goals, not a design note.
+- **I flagged the partial-2026 problem three times without ever asking a question about it.** It sat in "Open questions" across two entries and was raised repeatedly in conversation, but no decision was ever put forward. Raising an issue is not the same as surfacing a decision, and a list of open questions can create a false impression that they are being actively worked.
+
+**What I changed**
+- Uncategorized: **18.4% → 11.9%**. Residual is genuinely hard (SKU strings like `a89471 batter mix x1`, generic names like `california medley`).
+- **Partial 2026 decided**: plot it as a **dashed final segment with an explicit "partial year — through Aug 2026" label**. Data through 2026-08-05 means 2026 holds ~7 months against every other year's 12, so it plots 692 against 2025's 1,571 — a phantom 56% drop. Annualising or projecting was ruled out as inventing data and edging into the predictive territory the Non-Goals forbid.
+- **LLM classification logged as Phase 3**, not dropped. See `LEARNINGS.md`; the key distinction is that the PRD's "never LLM-generated" rule governs *claims about the data*, not *labelling of input rows* in a one-time offline pass whose output is frozen into the CSV and auditable.
+- Decided **not** to derive further classifications. `classification` (Class I/II/III) is already clean and needs none. Distribution scope, repeat-offender status, and recall duration were all considered and rejected: none serve the three core questions, and each adds filter combinations that produce more empty states and more surface for silent misfiling.
+
+**Final category distribution (29,161 rows, 17 categories)**
+
+```
+Produce 17.0%  Bakery 14.1%  Uncategorized 11.9%  Seafood 8.6%  Dairy 8.3%
+Prepared/Frozen 8.0%  Snacks 7.7%  Spices 6.0%  Supplements 5.7%
+Beverages 4.4%  Grains/Cereal 3.9%  Nuts/Seeds 2.7%
+Poultry 0.7%  Pork 0.3%  Beef 0.2%  Plant Protein 0.2%  Oils/Fats 0.2%
+```
+
+**Open questions carried into Phase 2**
+- Seasonality is entirely unexamined — the month distribution has not been looked at once. This is the only one of the three core questions where the answer is genuinely unknown going in.
+- Whether 17 categories is too many for a readable horizontal bar chart, or whether the tail should collapse into "Other" for display only (keeping the underlying data intact).
+
+**Time spent**
+~1 session, mostly discussion rather than code.
+
+---

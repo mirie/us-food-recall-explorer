@@ -184,3 +184,26 @@ Result: sent mid-turn, while a slice was in progress. Changed the commit cadence
 
 > **Meat categories** — surfaced after inspecting what actually landed in Beef/Pork/Poultry and finding `Natural Beef Flavor`, `Bacon Brittle`, and `MME Chicken Parmesan No Meat`. → *Demote below product form*, and *build the top-foods chart to real data, documenting the wireframe divergence.* The underlying fact — FDA does not regulate meat, poultry, or processed egg products, USDA FSIS does — was not in the PRD, the wireframe, or any planning document, and it invalidates three of the wireframe's eight top-foods bars.
 
+
+## Tool: Claude Code — challenging an overstated finding
+
+> "Does this apply to top-foods generally or are you just fixating on a fake data point of Poultry. Please note that the designs were not based on real data but is just a low-fi representation of the general design."
+
+Result: the challenge was correct and the claim was withdrawn. I had recorded the wireframe's top-foods chart as "not achievable" because it ranks Poultry #1; in fact only its placeholder labels differ from real data, which is exactly what a low-fidelity mock is for. The chart's structure works as drawn. Notable as the first time in the project that a *finding* — rather than a plan or an assumption — was overstated and had to be walked back, and it took a direct challenge rather than self-review to catch it. The underlying USDA jurisdiction fact was real; the design conclusion drawn from it was not.
+
+> "Tell me more. I'm not following -- did I miss a question earlier that you asked me?"
+
+Result: no, and that was the point. The partial-2026 problem had been listed under "Open questions" across two build-log entries and mentioned three times in conversation, but no decision had ever actually been put forward. Recorded because it is a specific failure mode worth naming: **an open-questions list can look like active work while nothing is being decided.** Flagging is not asking.
+
+> "I need to know more about this. Can we discuss different approaches? What are the tradeoffs?"
+
+Result: forced the Uncategorized question out of a one-line recommendation and into a measured comparison — which immediately refuted my own characterisation of it. I had called the bucket irreducible ambiguity; sampling 25 rows showed missing keywords and three absent categories. The prompt asked for tradeoffs, and producing real ones required inspecting the data rather than reasoning about it.
+
+> "Also would it help or hurt to do some classifications on the data set for the visualizations -- seems that's what you're already doing, but wanted to double check if there's anything else to consider"
+
+Result: surfaced the risk worth naming explicitly — every derived column launders judgment into something that reads as measurement. A bar labelled "Produce 17.0%" carries the authority of a count, but the assignment behind it is a keyword rule. This is the strongest argument for keeping `Uncategorized` visible: it is the one element of the chart that admits the rules are rules. Also settled what *not* to classify further (distribution scope, repeat-offender status, recall duration) — all rejected for not serving the three core questions.
+
+> "Don't forget to update the relevant files with decisions, logs as well (build_log.md, prompt_log.md, etc). I'll clear this session when we are ready to do Phase 2."
+
+Result: sent mid-turn. Worth logging as a process note — the documentation requirement held up across the whole build, but it needed reinforcing at exactly the point where a decision-heavy discussion was about to end without being written down.
+
