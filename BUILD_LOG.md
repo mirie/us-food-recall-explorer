@@ -250,7 +250,7 @@ Turn the raw snapshot into an analysis-ready DataFrame — food category, contam
 - `\bpie\b` → `\bpies?\b`; bare `apple` → `\bapples?\b`. Both have named regression tests.
 - Explicit date plausibility window (2000–2100) in `parse_recall_dates`.
 - Decisions taken this phase:
-  1. **Category = priority-ordered, specific beats generic.** Accepted misfire: "ice cream sandwich" resolves to Bakery, not Dairy. Surfaced in "About the data" rather than hidden.
+  1. **Category = priority-ordered, specific beats generic.** *(Superseded in Entry 2.6 — the "ice cream sandwich → Bakery" example recorded here was never tested and was factually wrong; it resolved to Prepared/Frozen. It now resolves to Dairy.)*
   2. **Reasons are multi-label.** Empirically this matters less than expected — only 499 rows (1.7%) carry two or more tags, averaging 1.02. Still the right semantic choice, but the "percentages won't sum to 100%" caveat is far smaller in practice than in principle.
   3. **The wireframe's top-foods chart is not achievable.** It ranks Poultry #1, Beef #3, Pork #4. Building to real data and documenting the divergence, consistent with how the 2004-axis divergence was handled.
 
@@ -314,5 +314,49 @@ Poultry 0.7%  Pork 0.3%  Beef 0.2%  Plant Protein 0.2%  Oils/Fats 0.2%
 
 **Time spent**
 ~1 session, mostly discussion rather than code.
+
+---
+
+## Entry 2.6 — Category Accuracy: Two More Failure Classes, and Freezing the Rules
+
+**Goal**
+Respond to a challenge on a documented classification example — and, on finding it was wrong, work out how much else was wrong.
+
+**What broke**
+
+1. **I documented a behaviour I never ran.** The claim "ice cream sandwich resolves to Bakery" was written into a module docstring, the PRD, `HANDOFF_PHASE2.md`, and two build-log entries. It was false — it resolved to `Prepared/Frozen`. I invented a plausible-sounding example to illustrate a real limitation and never executed it. Worse, it was recorded as an *accepted tradeoff*, which framed a fabrication as a considered decision.
+
+2. **The underlying classification was also wrong, and systematically.** Challenged on whether an ice cream sandwich is really a bakery item, measuring showed **1,393 rows mentioning "ice cream" scattered across nine categories, only 35% in Dairy**. The cause is structural: the ladder ranks *single words*, which works when a product's identity is a single word (`cheesecake` was 95% Bakery) and fails when it is a phrase, because whichever incidental flavour word appears first wins. `strawberry yogurt` hit `berr` in Produce long before Dairy was reached; 605 `peanut butter` rows were dragged toward Dairy by the word "butter".
+
+3. **Packaging vocabulary was being read as food vocabulary.** Found while verifying the fix above: **509 rows — a fifth of the entire Seafood category — were cheesecakes and salads sold in plastic CLAMSHELLS.** Plus 68 more from "plastic wrap" landing in Prepared/Frozen. This bug lived entirely inside "successfully categorised" rows, so no coverage metric would ever have surfaced it.
+
+4. **I had been reporting coverage as though it answered accuracy.** "11.9% Uncategorized" was quoted repeatedly as the quality figure. It measures only how many rows got *a* label, not how many got the *right* one. The clamshell bug inflated Seafood by 25% without touching the coverage number at all.
+
+**What I changed**
+- Added `PRODUCT_IDENTITY` as tier 0 — multi-word product identities checked before the single-word ladder. Result: ice cream 9 categories → 1, yogurt 10 → 1, cream cheese 9 → 1, sour cream 8 → 1, peanut butter 9 → 2 (the remainder being "peanut butter ice cream", correctly Dairy).
+- Added `_strip_packaging()` — removes packaging language before matching, rather than defending every food keyword with a lookaround. Keeps the fix in one place as more turn up. Seafood 2,448 → 1,959.
+- Tests assert that real clams and real food wraps still classify correctly, so the narrowing does not disarm the keywords it narrows.
+- Corrected the fabricated example everywhere it had propagated.
+- **Froze the category rules.** Decision taken with Mai: stop patching reactively, document honestly, and revisit via the Phase 3 LLM pass.
+
+**Why freeze rather than keep fixing**
+Five distinct failure classes have now been found — ingredient-vs-product-type, meat-as-ingredient, regex substring bugs, phrase-identity shattering, and packaging vocabulary. Each fix was cheap. The problem is that **no process is producing these findings**: four of the five came from someone happening to look at the right rows, and two of those from Mai rather than from me. There is no reason to believe a sixth class does not exist, and no way to find it except more luck. Continuing to patch would consume unbounded time while producing a number that still could not be quoted with confidence.
+
+The architecture makes freezing cheap: `pipeline.py` sets `df["category"]` in a single line, and no chart code will ever care whether that column came from regex or from a frozen LLM pass. The swap is a one-line change, so deferring costs essentially no rework.
+
+**Final Phase 1 distribution (29,161 rows)**
+
+```
+Produce 15.9%  Bakery 13.1%  Dairy 12.6%  Uncategorized 12.2%
+Prepared/Frozen 7.2%  Seafood 6.7%  Spices 6.1%  Snacks 6.0%
+Supplements 5.5%  Nuts/Seeds 5.1%  Beverages 4.5%  Grains/Cereal 3.5%
+Poultry 0.7%  Pork 0.3%  Beef 0.2%  Plant Protein 0.2%  Oils/Fats 0.2%
+```
+
+**Open questions carried into Phase 2**
+- Unchanged from Entry 2.5, plus: **category accuracy remains unmeasured.** The About section must say so rather than implying the 12.2% Uncategorized figure is a quality metric.
+
+**Time spent**
+~1 session, entirely reactive to a single challenge on a single word.
 
 ---

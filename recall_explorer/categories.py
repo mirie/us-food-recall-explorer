@@ -18,9 +18,20 @@ Broad categories whose keywords double as ingredients (Dairy, Nuts/Seeds,
 Spices/Condiments) sit at the bottom, so they only claim a row when nothing
 more specific did.
 
-Known limitation, accepted deliberately: this misfires on products whose
-identity *is* the ingredient. "Ice cream sandwich" resolves to Bakery, not
-Dairy. Surfaced in the app's "About the data" section rather than hidden.
+Known failure classes, all found by manual inspection rather than by any
+systematic process -- which is itself the most important thing to know about
+this module. Accuracy on the ~88% of rows that DO get a label has never been
+measured; only coverage has.
+
+  1. Ingredient words outranking product type -- fixed by tiering.
+  2. Meat words are ingredient words here (FDA vs USDA) -- fixed by demotion.
+  3. Regex substring bugs (`apple` matched "pineapple") -- fixed, tested.
+  4. Multi-word identities shattering across categories -- fixed by tier 0.
+  5. Packaging vocabulary read as food -- fixed by _strip_packaging.
+
+There is no reason to believe a sixth class does not exist. An LLM labelling
+pass is deferred to Phase 3 specifically to replace this guesswork; see the
+PRD. Until then, treat category counts as good-but-unquantified.
 """
 
 import re

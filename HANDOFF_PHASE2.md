@@ -14,7 +14,7 @@ recall_explorer/
   reasons.py               tag_reasons()      -- multi-label
   transforms.py            parse_recall_dates(), count_by(df, dimension, lens)
   pipeline.py              load_recalls()     -- the only module touching the filesystem
-tests/                     54 passing:  pytest
+tests/                     63 passing:  .venv/bin/pytest
 ```
 
 Start every session with `.venv/bin/pytest`. If it isn't green, fix that before anything else.
@@ -26,9 +26,9 @@ Start every session with `.venv/bin/pytest`. If it isn't green, fix that before 
 ```
 29,161 product rows  /  7,791 events  =  3.74 products per event
 
-Produce 17.0%  Bakery 14.1%  Uncategorized 11.9%  Seafood 8.6%  Dairy 8.3%
-Prepared/Frozen 8.0%  Snacks 7.7%  Spices 6.0%  Supplements 5.7%
-Beverages 4.4%  Grains/Cereal 3.9%  Nuts/Seeds 2.7%
+Produce 15.9%  Bakery 13.1%  Dairy 12.6%  Uncategorized 12.2%
+Prepared/Frozen 7.2%  Seafood 6.7%  Spices 6.1%  Snacks 6.0%
+Supplements 5.5%  Nuts/Seeds 5.1%  Beverages 4.5%  Grains/Cereal 3.5%
 Poultry 0.7%  Pork 0.3%  Beef 0.2%  Plant Protein 0.2%  Oils/Fats 0.2%
 
 Reasons (multi-label, 84.3% tagged):
@@ -60,7 +60,7 @@ Severity: Class II 14,616  Class I 12,804  Class III 1,741
 ## Known limitations to surface in the About section
 
 - **openFDA covers FDA-regulated food only.** Meat, poultry, and processed egg products are USDA FSIS jurisdiction and absent here — which is why the meat categories are near-empty. Say this, or a reader concludes meat is rarely recalled.
-- **Category is keyword-derived and lossy.** ~11.9% `Uncategorized`; known misfire class: products whose identity *is* an ingredient ("ice cream sandwich" → Bakery).
+- **Category is keyword-derived, lossy, and of unmeasured accuracy.** ~12.2% `Uncategorized` — but that is *coverage*, not correctness. Accuracy on the ~88% that do get a label has never been measured. Five distinct failure classes were found and fixed during Phase 1, every one by someone happening to inspect the right rows rather than by any systematic process; the worst (packaging words like "clamshell") had inflated Seafood by 25% while sitting inside "successfully categorised". Assume a sixth class exists. **Category rules are frozen as of Phase 1 — do not patch them reactively during Phase 2.** The replacement plan is the Phase 3 LLM pass.
 - **Reason tags are multi-label**, so any share is "of recalls mentioning X", never "share of total". Only 1.7% of recalls carry 2+ tags, so the distortion is small — but the wording must still be right.
 - **Recall counts are not a food-safety measure.** Changes may reflect detection and reporting practice. Standing caveat.
 - **No country of origin exists** in this data. `country`/`state` are the recalling firm's address.
