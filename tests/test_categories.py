@@ -15,6 +15,70 @@ def test_specific_category_beats_generic_ingredient_mention():
     assert assign_category("Raw shrimp in garlic butter sauce") == "Seafood"
 
 
+# --- Packaging words are not food words -------------------------------------
+# Third distinct failure class, after ingredient-vs-product-type and multi-word
+# identities: descriptions describe their packaging, and packaging vocabulary
+# overlaps food vocabulary. 509 rows -- a fifth of the Seafood category -- were
+# cheesecakes and salads sold in plastic CLAMSHELLS.
+
+def test_clamshell_packaging_is_not_a_clam():
+    assert assign_category(
+        "Forest View Bakery Cheesecake with Poppy seeds in 18oz plastic clam shell"
+    ) == "Bakery"
+    assert assign_category(
+        "Whole Foods Red Velvet Cheesecake Slice, plastic clamshell"
+    ) == "Bakery"
+
+
+def test_plastic_wrap_is_not_a_food_wrap():
+    assert assign_category(
+        "Veggie kabob w/mushroom, refrigerated, packaged in plastic wrap"
+    ) == "Produce"
+
+
+def test_real_clams_are_still_seafood():
+    # The fix must not disarm the keyword it is narrowing.
+    assert assign_category("Fresh littleneck clams, 2 lb bag") == "Seafood"
+
+
+def test_real_food_wraps_are_still_prepared():
+    assert assign_category("Chicken caesar wrap, refrigerated single serve") == "Prepared/Frozen"
+
+
+# --- Multi-word product identities bind before anything else ----------------
+# Measured failure: a product whose name is two words gets claimed by whichever
+# incidental flavour word appears first. "Strawberry yogurt" hit Produce (berr)
+# before Dairy was ever reached; 1,393 rows mentioning "ice cream" scattered
+# across nine categories with only 35% in Dairy. Single-token identities like
+# "cheesecake" were always fine (95% Bakery) -- the phrase is the problem.
+
+def test_ice_cream_is_dairy_whatever_follows_it():
+    assert assign_category("Ice cream sandwich, 6 ct") == "Dairy"
+    assert assign_category("Strawberry ice cream, 1 pint") == "Dairy"
+    assert assign_category("Ice Cream Bar, chocolate coated") == "Dairy"
+
+
+def test_peanut_butter_is_nuts_not_dairy():
+    # "butter" dragged 605 peanut butter rows toward Dairy.
+    assert assign_category("Creamy peanut butter, 16 oz jar") == "Nuts/Seeds"
+
+
+def test_cream_cheese_is_dairy_not_bakery():
+    assert assign_category("Strawberry cream cheese spread, 8 oz") == "Dairy"
+
+
+def test_flavoured_yogurt_is_dairy_not_produce():
+    # "cherr" and "berr" in the Produce rule were claiming flavoured yogurt.
+    assert assign_category("Cherry yogurt, 6 oz cup") == "Dairy"
+    assert assign_category("Blueberry Greek yogurt") == "Dairy"
+
+
+def test_single_token_identities_still_resolve_as_before():
+    # These were never broken -- guard against the new tier changing them.
+    assert assign_category("New York cheesecake, 10 inch") == "Bakery"
+    assert assign_category("Dutch apple pie, 8 inch") == "Bakery"
+
+
 def test_product_form_beats_ingredient_word():
     # Regression guard on rule ORDER: moving Dairy above Bakery breaks this.
     assert assign_category("Chocolate chip cookies made with real butter") == "Bakery"

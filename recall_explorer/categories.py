@@ -27,6 +27,48 @@ import re
 
 UNCATEGORIZED = "Uncategorized"
 
+# Descriptions describe their packaging, and packaging vocabulary overlaps food
+# vocabulary. Stripping it before matching is cleaner than defending every food
+# keyword with a lookaround, and it keeps the fix in one place as more turn up.
+#
+# Measured: "clamshell" alone put 509 rows -- a fifth of the entire Seafood
+# category -- into Seafood, nearly all of them cheesecakes and salads.
+PACKAGING_NOISE = re.compile(
+    r"clam\s*-?\s*shell(s|ed)?"
+    r"|(plastic|shrink|cello|cellophane|film|poly|saran)\s*-?\s*wrap(ped|per)?"
+    r"|chip\s*board"
+    r"|(can|bag|box|drum|tote)\s*liner",
+)
+
+
+def _strip_packaging(text):
+    """Remove packaging language so it cannot be read as food language."""
+    return PACKAGING_NOISE.sub(" ", text)
+
+# Tier 0 -- multi-word product identities, checked before every other rule.
+#
+# The keyword ladder below resolves ambiguity by ranking single words, which
+# works when a product's identity IS a single word ("cheesecake" landed in
+# Bakery 95% of the time). It fails badly when the identity is a phrase: the
+# ladder matches whichever incidental flavour word appears first, so
+# "strawberry yogurt" hit `berr` in Produce long before Dairy was reached.
+#
+# Measured before adding this tier: 1,393 rows mentioning "ice cream" scattered
+# across NINE categories with only 35% in Dairy; 605 "peanut butter" rows were
+# pulled toward Dairy by the word "butter"; 483 "yogurt" rows led with Produce.
+#
+# Order within this list matters too -- "ice cream" must be tested before
+# "cream", and "peanut butter" before "butter".
+PRODUCT_IDENTITY = [
+    ("Dairy", r"ice cream|icecream|gelato|frozen yogurt|yogurt|yoghurt|"
+              r"cream cheese|sour cream|whipped cream|heavy cream|"
+              r"half and half|cottage cheese|string cheese"),
+    ("Nuts/Seeds", r"peanut butter|almond butter|cashew butter|nut butter|"
+                   r"sunflower butter|tahini"),
+    ("Beverages", r"almond milk|soy milk|oat milk|rice milk|cashew milk|"
+                  r"coconut milk|coconut water"),
+]
+
 # Order is load-bearing -- first match wins. See module docstring.
 CATEGORY_RULES = [
     # Tier 1 -- narrow, and these words genuinely name a product here.
@@ -89,8 +131,16 @@ CATEGORY_RULES = [
 
 
 def assign_category(description):
-    """Return the first matching category, or UNCATEGORIZED if none match."""
-    text = (description or "").lower()
+    """Return the best-matching category, or UNCATEGORIZED if none match.
+
+    Two passes: multi-word product identities first (PRODUCT_IDENTITY), then
+    the single-word precedence ladder (CATEGORY_RULES). See each list's
+    comments for why the split exists.
+    """
+    text = _strip_packaging((description or "").lower())
+    for category, pattern in PRODUCT_IDENTITY:
+        if re.search(pattern, text):
+            return category
     for category, pattern in CATEGORY_RULES:
         if re.search(pattern, text):
             return category
