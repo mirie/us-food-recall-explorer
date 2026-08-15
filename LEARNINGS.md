@@ -47,6 +47,12 @@ Consolidated from the planning/design phase and continued through the build (see
 
 - **Honest note on discipline.** One GREEN step over-implemented: the failing test required a single category rule and I wrote thirteen. The keyword table is closer to data than to logic, but the accurate description is a lapse, and the tests written afterwards lock behaviour rather than drive it. They still earn their place — I verified the ordering guard by promoting Dairy and watching the assertion break — but recording the lapse matters more than the rationalisation for it.
 
+## What I'd want to know earlier (author's own reflections)
+
+- **That USDA food recall data is a separate system entirely.** FDA and USDA FSIS split jurisdiction over the food supply — FDA covers most packaged and processed food, USDA covers meat, poultry, and processed egg products — and each publishes its own recall data. I picked the openFDA dataset without knowing that "US food recalls" is structurally two datasets, so the app can only ever answer the question for one half of the food supply. Not a blocker and not something to fix now: the honest move is to state the boundary in "About the data" and note **combining FDA + USDA FSIS as a future iteration**. Worth flagging as a general lesson about public data — jurisdictional splits inside a domain are invisible from the API docs and only show up when you look at what's *missing* from the results.
+
+- **How to use an LLM to classify free text like this.** The whole food-category problem — free-text product descriptions, keyword rules that leave 18.4% uncategorized and misfire on ingredient mentions — is precisely the kind of task an LLM handles well and regex handles badly. I defaulted to keyword matching because it's what I knew, without seriously evaluating a one-time LLM labelling pass as an alternative. Worth distinguishing two very different uses of an LLM here, because the PRD's "never LLM-generated" rule applies to only one of them: generating *claims* about the data (banned, and rightly) is not the same as *labelling input rows* in a one-time offline preprocessing step whose output is frozen into the CSV, inspectable, and committed. The app would stay fully deterministic and offline either way. Something to learn properly — and directly relevant given this is a course on agentic AI.
+
 ## Tool-authored reflections (kept verbatim — strong analysis worth preserving as originally written)
 
 **Claude Design, on its own wireframe sequence:**
