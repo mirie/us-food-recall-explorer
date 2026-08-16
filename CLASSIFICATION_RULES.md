@@ -283,7 +283,7 @@ products" entries; anything genuinely ambiguous.
 | **Cooked beans** | Cooked bean dishes are `Plant Protein`, not `Prepared/Frozen`. This overrides the composite-meal rule. |
 | **Supplements vs. Food Additives** | Consumer dosage forms are Supplements. The same substance in 25–50 kg drums for manufacturing is Food Additives (bulk pepsin, bulk magnesium citrate). |
 | **Frozen novelties** | Dairy-based (ice cream, sherbet, gelato) → `Dairy`. Water-based (Italian ice, popsicles, bolis, **sorbet/sorbetto**) and non-dairy frozen desserts → `Prepared/Frozen`. |
-| **Bare deli trays/platters** | A generic "TRAY"/"PLATTER" description with no other food-identifying text follows a named cut or style when one is present (carving tray, charcuterie tray, meat loaf platter → `Beef/Pork/Poultry/Game Meats`). Genuinely unnamed contents (a bare "cocktail tray" or "catering tray" with no named filling) → `Uncategorized`, not a guess. |
+| **Bare deli trays/platters** | A generic "TRAY"/"PLATTER" description with no other food-identifying text follows a named cut or style when one is present (carving tray, charcuterie tray, meat loaf platter → `Beef/Pork/Poultry/Game Meats`). Genuinely unnamed contents (a bare "cocktail tray" or "catering tray" with no named filling) → `Prepared/Frozen` — a composite, mixed-contents assortment, not a guess at a single-ingredient label. |
 | **Snack mixes** | Nut- or dried-fruit-based → `Nuts/Seeds`. Chip-, cracker-, or corn-based → `Snacks/Candy`. |
 | **Chile products** | Fresh whole peppers → `Produce`. Powders, pastes, roasted/diced processed chile, and chile kits → `Spices/Condiments`. |
 | **Batter mixes** | Bulk industrial batter/predust/breader → `Grains/Cereal`, not `Uncategorized`. |
@@ -388,6 +388,7 @@ dosage form from a supplement brand follows the dosage form →
   `Prepared/Frozen` with the other water-based frozen novelties (had split
   ~90/10 between `Prepared/Frozen` and `Dairy`). Also added a boundary rule
   for bare deli tray/platter descriptions (named cut/style → the meat
-  label; genuinely unnamed contents → `Uncategorized`). Label count
-  unchanged at 21; 27 rows in `recall_categories_llm_full.csv` corrected
+  label; genuinely unnamed contents → `Prepared/Frozen`, a composite
+  assortment rather than a single-ingredient guess). Label count
+  unchanged at 21; 29 rows in `recall_categories_llm_full.csv` corrected
   directly rather than re-running the full batch.

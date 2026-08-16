@@ -58,11 +58,11 @@
     "taxonomy_doc": "CLASSIFICATION_RULES.md",
     "taxonomy_label_count": 21,
     "uncategorized_share_before": "12.2% (3554/29161, keyword pass)",
-    "uncategorized_share_after": "0.73% (213/29159, post Step 3b + Mai's manual review fixes)",
+    "uncategorized_share_after": "0.72% (211/29159, post Step 3b + Mai's manual review fixes)",
     "confidence_distribution": {
-      "high": "64.6% (18827/29159)",
+      "high": "64.6% (18829/29159)",
       "medium": "29.8% (8701/29159)",
-      "low": "5.6% (1631/29159)"
+      "low": "5.6% (1629/29159)"
     },
     "step_3b_validation": {
       "1_self_consistency": {
@@ -97,8 +97,8 @@
       "description": "Mai's review of the Step 3b findings surfaced two real CLASSIFICATION_RULES.md gaps and one bare-description boundary pattern, corrected directly in recall_categories_llm_full.csv (v3 revision, see CLASSIFICATION_RULES.md's Revision history).",
       "human_breast_milk": "14 rows (donor/mothers'-own human milk, previously split across Dairy/Uncategorized/Baby-Toddler-Food) -> Baby/Toddler Food.",
       "sorbet": "9 rows (previously split ~90/10 Prepared/Frozen vs Dairy) -> Prepared/Frozen, clarifying sorbet is water-based, not dairy-based like sherbet.",
-      "bare_deli_trays": "4 of 6 flagged Albertson's bare tray/platter codes (named cut/style: carving, charcuterie, Italian sampler, loaf) -> Beef/Pork/Poultry/Game Meats. 2 with no named filling (catering tray, cocktail tray) left Uncategorized.",
-      "uncategorized_share_after": "0.73% (213/29159)"
+      "bare_deli_trays": "6 flagged Albertson's bare tray/platter codes: 4 with a named cut/style (carving, charcuterie, Italian sampler, loaf) -> Beef/Pork/Poultry/Game Meats; 2 with no named filling (catering tray, cocktail tray) -> Prepared/Frozen, per Mai's call that unnamed-contents trays are a composite assortment, not Uncategorized.",
+      "uncategorized_share_after": "0.72% (211/29159)"
     }
   }
 }

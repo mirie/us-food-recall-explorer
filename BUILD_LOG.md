@@ -1695,29 +1695,32 @@ calls.
   flagged for review, no change needed.
 - **Bare Albertson's deli tray/platter codes** (6 rows, e.g. "PLATTER LOAF
   SLC 20CT," "TRAY CHARCUTERIE ELEGANT," all `Uncategorized`): Mai read
-  the named-cut ones as deli meat. Applied to the 4 with a named cut/style
-  (carving, charcuterie, Italian sampler, loaf) -> `Beef/Pork/Poultry/Game
-  Meats`. Left 2 with no named filling ("catering tray," "cocktail tray")
-  `Uncategorized` -- genuinely unnamed contents, not a guess.
+  the named-cut ones as deli meat -> applied to 4 rows (carving,
+  charcuterie, Italian sampler, loaf) -> `Beef/Pork/Poultry/Game Meats`.
+  For the remaining 2 with no named filling ("SWEET START CATERING TRAY,"
+  "TRAY COCKTAIL"), Mai's follow-up call: "Categorized as a prepared
+  food" -> `Prepared/Frozen`, not `Uncategorized` -- a composite
+  assortment with unnamed contents still deserves a real label.
 
 **What I changed**
-27 rows patched directly in `data/recall_categories_llm_full.csv`
+29 rows patched directly in `data/recall_categories_llm_full.csv`
 (confidence set to `high` -- human-confirmed, no longer a model guess): 14
-human milk, 9 sorbet, 4 deli trays. `Uncategorized` share: 218 -> **213
-(0.73%)**.
+human milk, 9 sorbet, 6 deli trays (4 to the meat label, 2 to
+`Prepared/Frozen`). `Uncategorized` share: 218 -> **211 (0.72%)**.
 
 `CLASSIFICATION_RULES.md` updated (v3 in Revision history) to close the
 two real gaps for any future re-run: `Baby/Toddler Food` rule now names
 human/donor breast milk explicitly; `Dairy`'s sherbet/gelato line now
 distinguishes sorbet as water-based and points to `Prepared/Frozen`; a
 new boundary-rule row covers bare deli tray/platter descriptions (named
-cut/style -> the meat label, unnamed contents -> `Uncategorized`).
+cut/style -> the meat label, unnamed contents -> `Prepared/Frozen`).
 `fetch_metadata.json`'s `llm_classification_pass` block updated with the
-corrected confidence distribution and a new `manual_review_corrections`
+corrected confidence distribution and `manual_review_corrections`
 sub-block.
 
 **Time spent**
-~15 minutes: pulling every row matching each pattern, applying Mai's
-calls, updating the rules doc and metadata.
+~20 minutes: pulling every row matching each pattern, applying Mai's
+calls (including a follow-up correction on the deli-tray split), updating
+the rules doc and metadata.
 
 ---
