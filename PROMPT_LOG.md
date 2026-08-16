@@ -527,5 +527,24 @@ numbers as evidence. Logged the full result to `BUILD_LOG.md` Entry 13
 before presenting the proposal to Mai for approval, per Step 1's rule that
 nothing gets written to `CLASSIFICATION_RULES.md` or `CATEGORY_ENUM` first.
 
+> "sorry, this is already done via the API? Also I think if a protein powder has plant protein in it, it should be in Plant protein and not in supplements. Should plant milks go into plant protein too? pet food/treats -- i think this should be a separate category... I'm not convinced that all coffee creamers should be in beverages. I feel like if it's a dairy coffee creamer, it should go in dairy. If it's non-dairy and made with plant protein that should go in plant protein. If it doesn't fit in either, then I agree, Beverages makes sense."
+
+Result: confirmed the API call had already run (she was reviewing its
+output, `scratch/taxonomy_proposal.md`). Recognized her four points as one
+underlying correction — group by composition, not destination — and that
+the proposal's own stated principle for plant analogs ("classify by what
+they are made of, not what they imitate") already supported three of her
+four asks; it just hadn't been applied consistently to plant milk, plant
+creamer, and plant protein powder. Treated the protein-powder and pet-food
+corrections as settled from her message, but flagged the plant-milk
+question as a genuine open call rather than deciding it myself — asked via
+AskUserQuestion with a stated recommendation (yes, for consistency) rather
+than presenting three options with no lean. She confirmed. Wrote
+`scratch/taxonomy_proposal_v2.md`: a before/after diff against v1, not a
+rewrite, with the revised label set (now 21 — `Pet Food/Treats` added on
+top of v1's `Eggs` and `Baby/Toddler Food`) and revised rule text for the
+six affected labels. No second API call — this was re-grouping evidence
+the first call already gathered, not new analysis.
+
 ---
 

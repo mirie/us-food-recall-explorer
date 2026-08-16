@@ -1096,3 +1096,59 @@ have caught.
 combined including the truncated first attempt), reviewing the output.
 
 ---
+
+## Entry 14 — Step 1 taxonomy, revision round: four corrections from Mai
+
+**Goal**
+Fold Mai's review feedback on `scratch/taxonomy_proposal.md` into a revised
+proposal, without a second API call, and get final sign-off before writing
+`CLASSIFICATION_RULES.md`.
+
+**What Mai flagged**
+Four corrections, all the same underlying fix: v1 grouped several items by
+*where they're consumed* or *what they're not*, rather than by *what
+they're made of* — inconsistent with v1's own stated principle for plant
+analogs. Specifically: (1) protein powders/RTD shakes shouldn't all go to
+`Supplements` — plant-protein-based ones belong in `Plant Protein`; (2)
+should plant milks move from `Beverages` to `Plant Protein` too?; (3) pet
+food/treats shouldn't be lumped into `Non-Food Item` with genuinely
+inedible objects — it deserves its own label; (4) coffee creamer
+shouldn't be a blanket `Beverages` call — dairy creamer should be `Dairy`,
+plant-based creamer should follow whatever plant milk does.
+
+**What I did**
+Point 2 was a genuine open call (not something Mai's message resolved on
+its own), so asked via AskUserQuestion rather than deciding unilaterally.
+Mai chose "Plant Protein" — same composition-over-destination logic as the
+other three points, and consistent with how dairy milk itself sits in
+`Dairy` (composition) rather than `Beverages` (how it's drunk). That
+resolved point 4 automatically: creamer now splits three ways by base
+(dairy → Dairy, plant → Plant Protein, neither → Beverages fallback).
+
+Wrote `scratch/taxonomy_proposal_v2.md` (not checked in) — a diff-style
+document against v1, not a rewrite: a before/after table for the four
+points, the revised label set (now **21**, not v1's 20 — `Pet Food/Treats`
+is a new label on top of `Eggs` and `Baby/Toddler Food`), revised rule text
+for the six affected labels (`Plant Protein`, `Supplements`, `Dairy`,
+`Beverages`, `Non-Food Item`, new `Pet Food/Treats`), and an explicit note
+that everything else from v1 (open questions, coverage-hole rules, 7 of 8
+collisions) carries over unchanged. No new API call — these are precise
+re-groupings of rows the first call already examined and cited; the
+evidence didn't change, only which label it lands in.
+
+**What I changed**
+Nothing in `recall_explorer/`, `CLASSIFICATION_RULES.md`, or `data/` — v2
+is presented for final approval before any of that gets written, same rule
+as v1.
+
+**Open questions**
+None outstanding on the label set itself — all four correction points are
+now resolved (three from Mai's direct instruction, one via AskUserQuestion).
+Pending: Mai's final approval of the 21-label v2 set before
+`CLASSIFICATION_RULES.md` gets written.
+
+**Time spent**
+~10 minutes: reading feedback, asking the one genuinely open question,
+writing the revision document.
+
+---
