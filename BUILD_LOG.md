@@ -1199,3 +1199,66 @@ None. Ready to present the corrected v2 set for final approval.
 ~10 minutes.
 
 ---
+
+## Entry 16 — Phase 5 Step 1 checkpoint: CLASSIFICATION_RULES.md + CATEGORY_ENUM
+
+**Goal**
+Close out Step 1 of the master plan: write the approved 21-label taxonomy
+into the repo as `CLASSIFICATION_RULES.md`, rewrite `CATEGORY_ENUM` in
+`recall_explorer/llm_categories.py` to match it exactly, and add a
+doc/code sync test — the checkpoint that unblocks Step 2's classification
+script.
+
+**What I built**
+- `CLASSIFICATION_RULES.md` (repo root): the full taxonomy spec — label
+  set (21), governing principle, per-category rules (21 sections),
+  boundary rules (24 entries, up from the original log's 10), coverage-hole
+  rules (6 product types), known gaps (3), and a revision-history section
+  documenting v1 (API proposal) -> v2 (Mai's four corrections) -> v2
+  correction (the coffee-creamer walk-back from this session). Built by
+  merging `scratch/decision_log.md` (the original 18-label log),
+  `scratch/taxonomy_proposal.md` (v1's API output, with full row-level
+  citations), and `scratch/taxonomy_proposal_v2.md` (Mai's corrections)
+  into one authoritative document — no new analysis, no fabricated
+  evidence, every rule traceable to prior citations.
+- `recall_explorer/llm_categories.py`: `CATEGORY_ENUM` replaced with a
+  literal 21-item list matching the doc verbatim. Deleted
+  `EXTRA_LLM_CATEGORIES` and the derivation from `categories.py`'s
+  `CATEGORY_RULES`/`PRODUCT_IDENTITY` (the old enum was keyword-rule-shaped;
+  the new one is taxonomy-shaped and intentionally decoupled from the
+  frozen keyword module). Module docstring rewritten to explain the Phase 3
+  -> Phase 5 scope change.
+- `tests/test_llm_categories.py`: replaced
+  `test_category_enum_matches_categories_module_rules` (which asserted
+  keyword-rule categories were a subset of the enum -- meaningless now that
+  the enum no longer derives from keyword rules) with
+  `test_category_enum_matches_classification_rules_doc`, which regex-parses
+  the "## 1. Label set (21)" code block out of `CLASSIFICATION_RULES.md`
+  and asserts exact list equality against `CATEGORY_ENUM`. This is the
+  doc/code sync guardrail the master plan's Step 1 Output requires --
+  editing one without the other now fails a test.
+
+**What worked**
+`.venv/bin/pytest` -> 134 passed, no regressions. The only test that needed
+rewriting was the one directly coupled to the old enum-derivation logic;
+`export_for_classification`, `build_classification_prompt`, and
+`parse_classification_result` all still pass unmodified since they only
+reference `CATEGORY_ENUM` by name, not by how it's built.
+
+**What broke**
+Nothing. `categories.py` and its 31 tests are untouched, per the master
+plan's "out of scope" list -- it stays frozen, just no longer feeds
+`llm_categories.py`.
+
+**What I changed**
+See "What I built." No other files touched.
+
+**Open questions**
+None on the taxonomy itself. Step 2 (build `classify_all.py` against the
+Batch API) is next, per the master plan -- not started this session.
+
+**Time spent**
+~35 minutes: assembling `CLASSIFICATION_RULES.md` from three source docs,
+rewriting the enum, writing and verifying the sync test, full test run.
+
+---
