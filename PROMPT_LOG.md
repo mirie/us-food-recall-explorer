@@ -566,3 +566,24 @@ instead of three-way, while plant milk keeps its `Plant Protein` placement
 unchanged.
 
 ---
+
+## Session — Step 2: classify_all.py
+
+Mai's message: "start now" (approving progression to Step 2 after Step 1's
+checkpoint commit).
+
+Built `classify_all.py` against the master plan's Step 2 spec: Batch API,
+100-row chunks, 3 submissions, cached system prompt built from
+`CLASSIFICATION_RULES.md`, structured JSON-schema output constraining
+category/confidence by construction, submit/fetch as separate commands.
+TDD per the project's three-tier convention -- wrote
+`tests/test_classify_all.py` first, watched it fail on
+`ModuleNotFoundError`, then implemented against it. Caught two real
+surprises via the tests rather than assumption: the Batch API's `Request`
+type is a `TypedDict` (dict access, not attribute access), and two rows in
+the real dataset share a blank `recall_number` (a pre-existing openFDA
+data gap). Flagged the blank-recall_number collision as an open question
+for Mai before the pilot runs, since the current completeness check
+wouldn't detect losing one of those two rows silently.
+
+---

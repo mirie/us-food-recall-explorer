@@ -1262,3 +1262,91 @@ Batch API) is next, per the master plan -- not started this session.
 rewriting the enum, writing and verifying the sync test, full test run.
 
 ---
+
+## Entry 17 — Phase 5 Step 2: classify_all.py (Batch API classifier)
+
+**Goal**
+Build the one-time script that submits the full 29,161-row dataset to the
+Claude Message Batches API for classification under `CLASSIFICATION_RULES.md`,
+per the master plan's Step 2.
+
+**What I built**
+`classify_all.py` (repo root, beside `fetch_data.py`), two subcommands:
+- `submit` -- loads the full dataset, chunks it into 292 requests of up to
+  100 rows each, splits those into 3 roughly-equal submissions (98/97/97),
+  builds each request with a cached system block (`CLASSIFICATION_RULES.md`
+  + a task wrapper covering the confidence rubric and two worked examples,
+  one of them fixing v1's unresolved "Blue Bell coconut fudge" example to
+  its correct answer, `Dairy`), a `json_schema` output_config constraining
+  `category` to `CATEGORY_ENUM` and `confidence` to `high|medium|low` by
+  construction, and `effort: "high"` with default adaptive thinking. Writes
+  batch IDs to `data/batch_ids.json`.
+- `fetch` -- polls every batch ID, reports per-batch status, and once all
+  have ended, streams every chunk's results (`succeeded`/`errored`/
+  `canceled`/`expired`, checking `stop_reason == "refusal"` before reading
+  content), validates zero missing / zero unexpected recall_numbers against
+  the full dataset, and writes `data/recall_categories_llm_full.csv`.
+  Aborts loudly (`SystemExit`) rather than writing a partial file.
+
+Pure logic factored out for TDD: `chunk_rows`, `split_into_submissions`,
+`custom_id_for`, `build_chunk_user_content`, `build_response_schema`,
+`build_system_blocks`, `build_chunk_request`, `parse_chunk_response_text`,
+`check_completeness`, `write_results_csv`, `rows_to_classify`.
+`tests/test_classify_all.py`: 25 tests, strict TDD (written first, watched
+fail on `ModuleNotFoundError` before any implementation existed), plus one
+real-file pipeline test (`rows_to_classify` against the actual
+`data/food_recalls.csv` via `load_recalls()`). The `submit`/`fetch` CLI
+functions themselves are not unit-tested -- per the project's standing
+skip list, no retry/mocking theater around network calls.
+
+**What worked**
+Chunk math confirmed against the master plan's estimate exactly: 29,161
+rows -> 292 chunks -> submissions of [98, 97, 97]. `.venv/bin/pytest` ->
+159 passed (134 prior + 25 new), zero regressions.
+
+**What broke**
+Two things caught by the tests, not assumed:
+1. `anthropic.types.messages.batch_create_params.Request` is a `TypedDict`,
+   not a class instance -- `request.custom_id` fails,
+   `request["custom_id"]` is correct. Caught immediately by the first test
+   run against real types, fixed in the test (the implementation was
+   already using dict-style construction correctly).
+2. **Two rows in the real dataset share a blank `recall_number`**
+   (`event_id` 99068 and 99205, both from a 2026-05/06 batch -- an
+   ANGEL-branded soft-serve powder recall and a Le Chef Bakery pastry
+   recall). Both fields are empty/`"N/A"` in the raw CSV, which pandas
+   reads as `NaN` for both, so they collapse to one key. This is a
+   pre-existing openFDA data gap, not introduced by this pass -- caught by
+   the real-file pipeline test expecting `len(df)` unique keys and getting
+   `len(df) - 1`.
+
+**What I changed**
+Fixed the `Request` test to dict-subscript access. Adjusted the real-file
+test's assertion to document the known 2-row blank-key collision rather
+than assume uniqueness. **Did not** invent a synthetic key for the two
+blank rows -- that's a data-quality call outside Step 2's scope.
+
+**Open questions**
+1. **The blank-recall_number collision needs a decision before `fetch`
+   runs for real.** As written, `cmd_fetch`'s completeness check treats the
+   dataset's `set(df["recall_number"])` as the expected set, which also
+   collapses the two blank IDs into one -- so the check will not flag a
+   missing classification if only one of the two rows' results survives
+   the final merge (`collected[row["recall_number"]] = row`, keyed by the
+   same blank string, second write wins). Net effect: the pilot and full
+   run would silently produce 29,160 output rows for 29,161 input rows,
+   with the loss undetectable by the current guard. Options: (a) use a
+   different join key entirely (`event_id` + row position) for these two
+   rows only, (b) exclude blank-recall_number rows from classification and
+   flag them for manual handling, (c) patch the two source rows in
+   `data/food_recalls.csv` with synthetic IDs before this pipeline runs.
+   Flagging for Mai before the pilot, not deciding unilaterally.
+2. Cost is still unknown until the pilot (Step 3) runs and measures actual
+   token usage -- nothing here should be read as a spend commitment.
+
+**Time spent**
+~50 minutes: reading the Batches API and structured-output reference
+material, writing the 25 failing tests, implementing against them, fixing
+the two real-vs-assumed-shape breaks, full suite run.
+
+---
