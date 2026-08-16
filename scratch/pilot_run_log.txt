@@ -1,0 +1,134 @@
+Pilot: 255 rows -> 3 chunks, 58 known-answer probes
+
+--- effort: high ---
+  [high] chunk 1/3 (100 rows)... PARSE FAILURE: Unterminated string starting at: line 1 column 5133 (char 5132)
+got 0 rows, stop_reason=max_tokens
+  [high] chunk 2/3 (100 rows)... got 100 rows, stop_reason=end_turn
+  [high] chunk 3/3 (55 rows)... got 55 rows, stop_reason=end_turn
+  usage: {'input_tokens': 32175, 'output_tokens': 13353, 'cache_creation_input_tokens': 10681, 'cache_read_input_tokens': 21362}
+  estimated pilot cost: $0.5721
+  probe accuracy: 0/58
+    MISS F-0023-2015: expected 'Eggs', got None
+    MISS F-0147-2017: expected 'Eggs', got None
+    MISS F-1410-2018: expected 'Eggs', got None
+    MISS H-0210-2025: expected 'Eggs', got None
+    MISS F-1626-2012: expected 'Produce', got None
+    MISS F-1618-2012: expected 'Produce', got None
+    MISS F-1606-2012: expected 'Produce', got None
+    MISS F-1614-2012: expected 'Produce', got None
+    MISS F-2320-2014: expected 'Beverages', got None
+    MISS F-2319-2014: expected 'Beverages', got None
+    MISS F-1949-2014: expected 'Beverages', got None
+    MISS F-2772-2015: expected 'Beverages', got None
+    MISS F-2292-2012: expected 'Dairy', got None
+    MISS F-1753-2012: expected 'Dairy', got None
+    MISS F-2113-2012: expected 'Dairy', got None
+    MISS F-1717-2014: expected 'Dairy', got None
+    MISS F-1622-2013: expected 'Beef/Pork/Poultry/Game Meats', got None
+    MISS F-1274-2019: expected 'Beef/Pork/Poultry/Game Meats', got None
+    MISS F-1527-2022: expected 'Beef/Pork/Poultry/Game Meats', got None
+    MISS F-2151-2012: expected 'Seafood', got None
+    MISS F-0841-2013: expected 'Seafood', got None
+    MISS F-0684-2013: expected 'Seafood', got None
+    MISS F-1801-2012: expected 'Seafood', got None
+    MISS F-0398-2013: expected 'Nuts/Seeds', got None
+    MISS F-0559-2013: expected 'Nuts/Seeds', got None
+    MISS F-1378-2014: expected 'Nuts/Seeds', got None
+    MISS F-1476-2013: expected 'Nuts/Seeds', got None
+    MISS F-1786-2012: expected 'Snacks/Candy', got None
+    MISS F-1787-2012: expected 'Snacks/Candy', got None
+    MISS F-1788-2012: expected 'Snacks/Candy', got None
+    MISS F-1789-2012: expected 'Snacks/Candy', got None
+    MISS F-0676-2013: expected 'Bakery', got None
+    MISS F-1403-2012: expected 'Bakery', got None
+    MISS F-0660-2013: expected 'Bakery', got None
+    MISS F-0781-2013: expected 'Oils/Fats', got None
+    MISS F-1930-2012: expected 'Oils/Fats', got None
+    MISS F-2140-2012: expected 'Oils/Fats', got None
+    MISS F-1427-2012: expected 'Oils/Fats', got None
+    MISS F-2107-2012: expected 'Plant Protein', got None
+    MISS F-1874-2012: expected 'Plant Protein', got None
+    MISS F-2073-2012: expected 'Plant Protein', got None
+    MISS F-2117-2012: expected 'Plant Protein', got None
+    MISS F-1686-2014: expected 'Grains/Cereal', got None
+    MISS F-0090-2015: expected 'Grains/Cereal', got None
+    MISS F-1260-2016: expected 'Grains/Cereal', got None
+    MISS F-1753-2019: expected 'Pet Food/Treats', got None
+    MISS F-1754-2019: expected 'Pet Food/Treats', got None
+    MISS F-1409-2015: expected 'Baby/Toddler Food', got None
+    MISS F-1558-2019: expected 'Baby/Toddler Food', got None
+    MISS F-0022-2020: expected 'Baby/Toddler Food', got None
+    MISS F-0303-2013: expected 'Spices/Condiments', got None
+    MISS F-0032-2013: expected 'Spices/Condiments', got None
+    MISS F-0632-2013: expected 'Spices/Condiments', got None
+    MISS F-1581-2013: expected 'Baking Supplies', got None
+    MISS F-1514-2013: expected 'Baking Supplies', got None
+    MISS F-1600-2014: expected 'Baking Supplies', got None
+    MISS F-0588-2020: expected 'Beef/Pork/Poultry/Game Meats', got None
+    MISS F-1577-2022: expected 'Beef/Pork/Poultry/Game Meats', got None
+  extrapolated full-run cost (x114.3): $65.42
+
+--- effort: medium ---
+  [medium] chunk 1/3 (100 rows)... got 100 rows, stop_reason=end_turn
+  [medium] chunk 2/3 (100 rows)... got 100 rows, stop_reason=end_turn
+  [medium] chunk 3/3 (55 rows)... got 55 rows, stop_reason=end_turn
+  usage: {'input_tokens': 32175, 'output_tokens': 12163, 'cache_creation_input_tokens': 10681, 'cache_read_input_tokens': 21362}
+  estimated pilot cost: $0.5424
+  probe accuracy: 36/58
+    MISS F-2292-2012: expected 'Dairy', got 'Supplements'
+    MISS F-1753-2012: expected 'Dairy', got 'Bakery'
+    MISS F-1622-2013: expected 'Beef/Pork/Poultry/Game Meats', got 'Plant Protein'
+    MISS F-1274-2019: expected 'Beef/Pork/Poultry/Game Meats', got 'Plant Protein'
+    MISS F-0841-2013: expected 'Seafood', got 'Spices/Condiments'
+    MISS F-0684-2013: expected 'Seafood', got 'Prepared/Frozen'
+    MISS F-1476-2013: expected 'Nuts/Seeds', got 'Bakery'
+    MISS F-0676-2013: expected 'Bakery', got 'Prepared/Frozen'
+    MISS F-0660-2013: expected 'Bakery', got 'Prepared/Frozen'
+    MISS F-0781-2013: expected 'Oils/Fats', got 'Bakery'
+    MISS F-1930-2012: expected 'Oils/Fats', got 'Seafood'
+    MISS F-2140-2012: expected 'Oils/Fats', got 'Spices/Condiments'
+    MISS F-1427-2012: expected 'Oils/Fats', got 'Seafood'
+    MISS F-2107-2012: expected 'Plant Protein', got 'Prepared/Frozen'
+    MISS F-1874-2012: expected 'Plant Protein', got 'Spices/Condiments'
+    MISS F-0303-2013: expected 'Spices/Condiments', got 'Nuts/Seeds'
+    MISS F-0032-2013: expected 'Spices/Condiments', got 'Produce'
+    MISS F-0632-2013: expected 'Spices/Condiments', got 'Prepared/Frozen'
+    MISS F-1514-2013: expected 'Baking Supplies', got 'Bakery'
+    MISS F-1600-2014: expected 'Baking Supplies', got 'Bakery'
+    MISS F-0588-2020: expected 'Beef/Pork/Poultry/Game Meats', got 'Seafood'
+    MISS F-1577-2022: expected 'Beef/Pork/Poultry/Game Meats', got 'Prepared/Frozen'
+  extrapolated full-run cost (x114.3): $62.02
+
+--- effort: low ---
+  [low] chunk 1/3 (100 rows)... got 100 rows, stop_reason=end_turn
+  [low] chunk 2/3 (100 rows)... got 100 rows, stop_reason=end_turn
+  [low] chunk 3/3 (55 rows)... got 55 rows, stop_reason=end_turn
+  usage: {'input_tokens': 32175, 'output_tokens': 9062, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 32043}
+  estimated pilot cost: $0.4034
+  probe accuracy: 37/58
+    MISS F-2292-2012: expected 'Dairy', got 'Plant Protein'
+    MISS F-1753-2012: expected 'Dairy', got 'Bakery'
+    MISS F-1622-2013: expected 'Beef/Pork/Poultry/Game Meats', got 'Plant Protein'
+    MISS F-1274-2019: expected 'Beef/Pork/Poultry/Game Meats', got 'Plant Protein'
+    MISS F-0841-2013: expected 'Seafood', got 'Spices/Condiments'
+    MISS F-1476-2013: expected 'Nuts/Seeds', got 'Bakery'
+    MISS F-0676-2013: expected 'Bakery', got 'Prepared/Frozen'
+    MISS F-0660-2013: expected 'Bakery', got 'Prepared/Frozen'
+    MISS F-0781-2013: expected 'Oils/Fats', got 'Bakery'
+    MISS F-1930-2012: expected 'Oils/Fats', got 'Seafood'
+    MISS F-2140-2012: expected 'Oils/Fats', got 'Spices/Condiments'
+    MISS F-1427-2012: expected 'Oils/Fats', got 'Seafood'
+    MISS F-2107-2012: expected 'Plant Protein', got 'Prepared/Frozen'
+    MISS F-1874-2012: expected 'Plant Protein', got 'Spices/Condiments'
+    MISS F-0303-2013: expected 'Spices/Condiments', got 'Nuts/Seeds'
+    MISS F-0032-2013: expected 'Spices/Condiments', got 'Produce'
+    MISS F-0632-2013: expected 'Spices/Condiments', got 'Prepared/Frozen'
+    MISS F-1514-2013: expected 'Baking Supplies', got 'Bakery'
+    MISS F-1600-2014: expected 'Baking Supplies', got 'Bakery'
+    MISS F-0588-2020: expected 'Beef/Pork/Poultry/Game Meats', got 'Seafood'
+    MISS F-1577-2022: expected 'Beef/Pork/Poultry/Game Meats', got 'Prepared/Frozen'
+  extrapolated full-run cost (x114.3): $46.13
+
+--- label agreement vs. high ---
+  medium: 152/155 agree with high (98.1%)
+  low: 153/155 agree with high (98.7%)

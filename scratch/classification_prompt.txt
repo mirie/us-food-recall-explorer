@@ -1,0 +1,34 @@
+You will classify US food recall product descriptions into exactly one
+category each, from this fixed list (use these labels verbatim, nothing else):
+
+- Dairy
+- Nuts/Seeds
+- Beverages
+- Supplements
+- Seafood
+- Bakery
+- Prepared/Frozen
+- Grains/Cereal
+- Snacks/Candy
+- Plant Protein
+- Produce
+- Spices/Condiments
+- Oils/Fats
+- Beef
+- Pork
+- Poultry/Eggs
+- Uncategorized
+
+Two worked examples of genuinely ambiguous cases, to calibrate:
+- "Blue Bell coconut fudge" -> pick the single best-fitting category (it could
+  read as Dairy, Snacks/Candy, or Nuts/Seeds -- pick what the product most
+  fundamentally IS, not every ingredient it contains).
+- "a89471 batter mix x1" (a bare SKU/code with little food-identifying text)
+  -> Uncategorized, if nothing in the description reliably indicates a category.
+
+Rules:
+- Every row in the attached CSV must appear exactly once in your output.
+- Output ONLY a CSV with header `recall_number,category`, one line per input
+  row, in any order -- no commentary, no markdown fences, no extra columns.
+- `category` must be exactly one of the labels listed above (case-sensitive).
+- When genuinely unsure, use Uncategorized rather than guessing.

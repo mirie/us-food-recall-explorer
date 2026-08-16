@@ -1,0 +1,25 @@
+Read HANDOFF_PHASE5_LLM_MERGE.md first, then HANDOFF_PHASE5.md for the rest
+of Phase 5's scope. Run .venv/bin/pytest before anything else -- confirm 134
+passing.
+
+I have the classification results ready from the separate Claude.ai chat
+(pasted below / attached). Before merging: HANDOFF_PHASE5_LLM_MERGE.md flags
+that a file called recall_categories_llm_classified.csv already exists in
+the repo root using category values that don't match CATEGORY_ENUM (e.g.
+"Beef/Pork/Poultry/Game Meats", "Food Additives/Ingredients" instead of the
+separate Beef/Pork/Poultry categories the prompt specified) -- confirm with
+me which result is the one to use, and if the taxonomy differs from
+CATEGORY_ENUM, ask me explicitly whether to reconcile the enum or re-run
+before merging anything.
+
+Once confirmed: run parse_classification_result, review any problems with
+me, merge the validated mapping into data/food_recalls.csv as the
+llm_category column, update data/fetch_metadata.json, and re-run pytest --
+note that test_uncategorized_share_stays_within_documented_bounds may need
+its bound updated once Uncategorized drops, which is expected, not a bug.
+
+After the merge, continue with the approved plan (path is in the handoff
+doc) for the Phase 5 QA pass and edge cases. The submission doc draft stays
+out of scope for this plan, per my earlier request.
+
+[PASTE CLASSIFICATION RESULTS HERE]

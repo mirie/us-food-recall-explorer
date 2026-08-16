@@ -1,0 +1,1400 @@
+{
+  "usage": {
+    "input_tokens": 32175,
+    "output_tokens": 12163,
+    "cache_creation_input_tokens": 10681,
+    "cache_read_input_tokens": 21362
+  },
+  "cost": 0.54238725,
+  "probe_correct": 36,
+  "probe_total": 58,
+  "probe_misses": [
+    [
+      "F-2292-2012",
+      "Dairy",
+      "Supplements"
+    ],
+    [
+      "F-1753-2012",
+      "Dairy",
+      "Bakery"
+    ],
+    [
+      "F-1622-2013",
+      "Beef/Pork/Poultry/Game Meats",
+      "Plant Protein"
+    ],
+    [
+      "F-1274-2019",
+      "Beef/Pork/Poultry/Game Meats",
+      "Plant Protein"
+    ],
+    [
+      "F-0841-2013",
+      "Seafood",
+      "Spices/Condiments"
+    ],
+    [
+      "F-0684-2013",
+      "Seafood",
+      "Prepared/Frozen"
+    ],
+    [
+      "F-1476-2013",
+      "Nuts/Seeds",
+      "Bakery"
+    ],
+    [
+      "F-0676-2013",
+      "Bakery",
+      "Prepared/Frozen"
+    ],
+    [
+      "F-0660-2013",
+      "Bakery",
+      "Prepared/Frozen"
+    ],
+    [
+      "F-0781-2013",
+      "Oils/Fats",
+      "Bakery"
+    ],
+    [
+      "F-1930-2012",
+      "Oils/Fats",
+      "Seafood"
+    ],
+    [
+      "F-2140-2012",
+      "Oils/Fats",
+      "Spices/Condiments"
+    ],
+    [
+      "F-1427-2012",
+      "Oils/Fats",
+      "Seafood"
+    ],
+    [
+      "F-2107-2012",
+      "Plant Protein",
+      "Prepared/Frozen"
+    ],
+    [
+      "F-1874-2012",
+      "Plant Protein",
+      "Spices/Condiments"
+    ],
+    [
+      "F-0303-2013",
+      "Spices/Condiments",
+      "Nuts/Seeds"
+    ],
+    [
+      "F-0032-2013",
+      "Spices/Condiments",
+      "Produce"
+    ],
+    [
+      "F-0632-2013",
+      "Spices/Condiments",
+      "Prepared/Frozen"
+    ],
+    [
+      "F-1514-2013",
+      "Baking Supplies",
+      "Bakery"
+    ],
+    [
+      "F-1600-2014",
+      "Baking Supplies",
+      "Bakery"
+    ],
+    [
+      "F-0588-2020",
+      "Beef/Pork/Poultry/Game Meats",
+      "Seafood"
+    ],
+    [
+      "F-1577-2022",
+      "Beef/Pork/Poultry/Game Meats",
+      "Prepared/Frozen"
+    ]
+  ],
+  "records": {
+    "F-0023-2015": {
+      "recall_number": "F-0023-2015",
+      "category": "Eggs",
+      "confidence": "high"
+    },
+    "F-0147-2017": {
+      "recall_number": "F-0147-2017",
+      "category": "Eggs",
+      "confidence": "high"
+    },
+    "F-1410-2018": {
+      "recall_number": "F-1410-2018",
+      "category": "Eggs",
+      "confidence": "high"
+    },
+    "H-0210-2025": {
+      "recall_number": "H-0210-2025",
+      "category": "Eggs",
+      "confidence": "high"
+    },
+    "F-1626-2012": {
+      "recall_number": "F-1626-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1618-2012": {
+      "recall_number": "F-1618-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1606-2012": {
+      "recall_number": "F-1606-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1614-2012": {
+      "recall_number": "F-1614-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-2320-2014": {
+      "recall_number": "F-2320-2014",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-2319-2014": {
+      "recall_number": "F-2319-2014",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-1949-2014": {
+      "recall_number": "F-1949-2014",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-2772-2015": {
+      "recall_number": "F-2772-2015",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-2292-2012": {
+      "recall_number": "F-2292-2012",
+      "category": "Supplements",
+      "confidence": "medium"
+    },
+    "F-1753-2012": {
+      "recall_number": "F-1753-2012",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-2113-2012": {
+      "recall_number": "F-2113-2012",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1717-2014": {
+      "recall_number": "F-1717-2014",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1622-2013": {
+      "recall_number": "F-1622-2013",
+      "category": "Plant Protein",
+      "confidence": "medium"
+    },
+    "F-1274-2019": {
+      "recall_number": "F-1274-2019",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-1527-2022": {
+      "recall_number": "F-1527-2022",
+      "category": "Beef/Pork/Poultry/Game Meats",
+      "confidence": "medium"
+    },
+    "F-2151-2012": {
+      "recall_number": "F-2151-2012",
+      "category": "Seafood",
+      "confidence": "medium"
+    },
+    "F-0841-2013": {
+      "recall_number": "F-0841-2013",
+      "category": "Spices/Condiments",
+      "confidence": "medium"
+    },
+    "F-0684-2013": {
+      "recall_number": "F-0684-2013",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1801-2012": {
+      "recall_number": "F-1801-2012",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-0398-2013": {
+      "recall_number": "F-0398-2013",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0559-2013": {
+      "recall_number": "F-0559-2013",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-1378-2014": {
+      "recall_number": "F-1378-2014",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-1476-2013": {
+      "recall_number": "F-1476-2013",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1786-2012": {
+      "recall_number": "F-1786-2012",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-1787-2012": {
+      "recall_number": "F-1787-2012",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-1788-2012": {
+      "recall_number": "F-1788-2012",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-1789-2012": {
+      "recall_number": "F-1789-2012",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-0676-2013": {
+      "recall_number": "F-0676-2013",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1403-2012": {
+      "recall_number": "F-1403-2012",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0660-2013": {
+      "recall_number": "F-0660-2013",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0781-2013": {
+      "recall_number": "F-0781-2013",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1930-2012": {
+      "recall_number": "F-1930-2012",
+      "category": "Seafood",
+      "confidence": "medium"
+    },
+    "F-2140-2012": {
+      "recall_number": "F-2140-2012",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1427-2012": {
+      "recall_number": "F-1427-2012",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-2107-2012": {
+      "recall_number": "F-2107-2012",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1874-2012": {
+      "recall_number": "F-1874-2012",
+      "category": "Spices/Condiments",
+      "confidence": "low"
+    },
+    "F-2073-2012": {
+      "recall_number": "F-2073-2012",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-2117-2012": {
+      "recall_number": "F-2117-2012",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-1686-2014": {
+      "recall_number": "F-1686-2014",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-0090-2015": {
+      "recall_number": "F-0090-2015",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-1260-2016": {
+      "recall_number": "F-1260-2016",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-1753-2019": {
+      "recall_number": "F-1753-2019",
+      "category": "Pet Food/Treats",
+      "confidence": "high"
+    },
+    "F-1754-2019": {
+      "recall_number": "F-1754-2019",
+      "category": "Pet Food/Treats",
+      "confidence": "high"
+    },
+    "F-1409-2015": {
+      "recall_number": "F-1409-2015",
+      "category": "Baby/Toddler Food",
+      "confidence": "high"
+    },
+    "F-1558-2019": {
+      "recall_number": "F-1558-2019",
+      "category": "Baby/Toddler Food",
+      "confidence": "high"
+    },
+    "F-0022-2020": {
+      "recall_number": "F-0022-2020",
+      "category": "Baby/Toddler Food",
+      "confidence": "high"
+    },
+    "F-0303-2013": {
+      "recall_number": "F-0303-2013",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0032-2013": {
+      "recall_number": "F-0032-2013",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0632-2013": {
+      "recall_number": "F-0632-2013",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1581-2013": {
+      "recall_number": "F-1581-2013",
+      "category": "Baking Supplies",
+      "confidence": "medium"
+    },
+    "F-1514-2013": {
+      "recall_number": "F-1514-2013",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-1600-2014": {
+      "recall_number": "F-1600-2014",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0588-2020": {
+      "recall_number": "F-0588-2020",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-1577-2022": {
+      "recall_number": "F-1577-2022",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1695-2022": {
+      "recall_number": "F-1695-2022",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0217-2023": {
+      "recall_number": "F-0217-2023",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1525-2019": {
+      "recall_number": "F-1525-2019",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-0159-2017": {
+      "recall_number": "F-0159-2017",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "H-0339-2026": {
+      "recall_number": "H-0339-2026",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-0643-2014": {
+      "recall_number": "F-0643-2014",
+      "category": "Dairy",
+      "confidence": "low"
+    },
+    "F-2928-2017": {
+      "recall_number": "F-2928-2017",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-3610-2017": {
+      "recall_number": "F-3610-2017",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1561-2017": {
+      "recall_number": "F-1561-2017",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-3044-2017": {
+      "recall_number": "F-3044-2017",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "H-0531-2025": {
+      "recall_number": "H-0531-2025",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0447-2023": {
+      "recall_number": "F-0447-2023",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1539-2018": {
+      "recall_number": "F-1539-2018",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0985-2016": {
+      "recall_number": "F-0985-2016",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0806-2021": {
+      "recall_number": "F-0806-2021",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-1790-2022": {
+      "recall_number": "F-1790-2022",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-3152-2017": {
+      "recall_number": "F-3152-2017",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-1190-2022": {
+      "recall_number": "F-1190-2022",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-2487-2017": {
+      "recall_number": "F-2487-2017",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0110-2016": {
+      "recall_number": "F-0110-2016",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "H-0922-2026": {
+      "recall_number": "H-0922-2026",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-0377-2018": {
+      "recall_number": "F-0377-2018",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0014-2018": {
+      "recall_number": "F-0014-2018",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-2498-2017": {
+      "recall_number": "F-2498-2017",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1023-2024": {
+      "recall_number": "F-1023-2024",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-0222-2024": {
+      "recall_number": "F-0222-2024",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-1373-2016": {
+      "recall_number": "F-1373-2016",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-0776-2016": {
+      "recall_number": "F-0776-2016",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-1475-2022": {
+      "recall_number": "F-1475-2022",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "H-0041-2026": {
+      "recall_number": "H-0041-2026",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0761-2020": {
+      "recall_number": "F-0761-2020",
+      "category": "Beverages",
+      "confidence": "low"
+    },
+    "F-1683-2012": {
+      "recall_number": "F-1683-2012",
+      "category": "Beverages",
+      "confidence": "medium"
+    },
+    "F-1645-2022": {
+      "recall_number": "F-1645-2022",
+      "category": "Plant Protein",
+      "confidence": "medium"
+    },
+    "F-0683-2017": {
+      "recall_number": "F-0683-2017",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-1501-2024": {
+      "recall_number": "F-1501-2024",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-0697-2023": {
+      "recall_number": "F-0697-2023",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-1307-2022": {
+      "recall_number": "F-1307-2022",
+      "category": "Food Additives/Ingredients",
+      "confidence": "medium"
+    },
+    "F-1949-2013": {
+      "recall_number": "F-1949-2013",
+      "category": "Dairy",
+      "confidence": "low"
+    },
+    "F-1667-2023": {
+      "recall_number": "F-1667-2023",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-2528-2015": {
+      "recall_number": "F-2528-2015",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1407-2022": {
+      "recall_number": "F-1407-2022",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-1496-2016": {
+      "recall_number": "F-1496-2016",
+      "category": "Oils/Fats",
+      "confidence": "high"
+    },
+    "F-0612-2016": {
+      "recall_number": "F-0612-2016",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1141-2017": {
+      "recall_number": "F-1141-2017",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-2142-2014": {
+      "recall_number": "F-2142-2014",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1703-2019": {
+      "recall_number": "F-1703-2019",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-0769-2025": {
+      "recall_number": "F-0769-2025",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-3107-2015": {
+      "recall_number": "F-3107-2015",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "H-0755-2026": {
+      "recall_number": "H-0755-2026",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "H-0308-2026": {
+      "recall_number": "H-0308-2026",
+      "category": "Dairy",
+      "confidence": "medium"
+    },
+    "F-0982-2019": {
+      "recall_number": "F-0982-2019",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1462-2015": {
+      "recall_number": "F-1462-2015",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1480-2012": {
+      "recall_number": "F-1480-2012",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-3146-2015": {
+      "recall_number": "F-3146-2015",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1173-2017": {
+      "recall_number": "F-1173-2017",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-2981-2015": {
+      "recall_number": "F-2981-2015",
+      "category": "Produce",
+      "confidence": "medium"
+    },
+    "F-0335-2023": {
+      "recall_number": "F-0335-2023",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1859-2013": {
+      "recall_number": "F-1859-2013",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-2181-2014": {
+      "recall_number": "F-2181-2014",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-2894-2015": {
+      "recall_number": "F-2894-2015",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-0110-2014": {
+      "recall_number": "F-0110-2014",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-2374-2012": {
+      "recall_number": "F-2374-2012",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-0858-2013": {
+      "recall_number": "F-0858-2013",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "H-0507-2026": {
+      "recall_number": "H-0507-2026",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-1752-2014": {
+      "recall_number": "F-1752-2014",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-1574-2019": {
+      "recall_number": "F-1574-2019",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-0263-2021": {
+      "recall_number": "F-0263-2021",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "H-0256-2025": {
+      "recall_number": "H-0256-2025",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-2026-2014": {
+      "recall_number": "F-2026-2014",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-1112-2022": {
+      "recall_number": "F-1112-2022",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0689-2013": {
+      "recall_number": "F-0689-2013",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-0950-2024": {
+      "recall_number": "F-0950-2024",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-1050-2018": {
+      "recall_number": "F-1050-2018",
+      "category": "Nuts/Seeds",
+      "confidence": "medium"
+    },
+    "F-0756-2017": {
+      "recall_number": "F-0756-2017",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-1338-2017": {
+      "recall_number": "F-1338-2017",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0552-2015": {
+      "recall_number": "F-0552-2015",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0542-2013": {
+      "recall_number": "F-0542-2013",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0285-2025": {
+      "recall_number": "F-0285-2025",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-1411-2018": {
+      "recall_number": "F-1411-2018",
+      "category": "Eggs",
+      "confidence": "high"
+    },
+    "F-0364-2020": {
+      "recall_number": "F-0364-2020",
+      "category": "Prepared/Frozen",
+      "confidence": "low"
+    },
+    "F-0265-2025": {
+      "recall_number": "F-0265-2025",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-2505-2017": {
+      "recall_number": "F-2505-2017",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "H-0258-2026": {
+      "recall_number": "H-0258-2026",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1570-2019": {
+      "recall_number": "F-1570-2019",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-0892-2022": {
+      "recall_number": "F-0892-2022",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0007-2024": {
+      "recall_number": "F-0007-2024",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0574-2020": {
+      "recall_number": "F-0574-2020",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0379-2017": {
+      "recall_number": "F-0379-2017",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1444-2017": {
+      "recall_number": "F-1444-2017",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "H-0094-2026": {
+      "recall_number": "H-0094-2026",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-0764-2016": {
+      "recall_number": "F-0764-2016",
+      "category": "Spices/Condiments",
+      "confidence": "low"
+    },
+    "F-0268-2022": {
+      "recall_number": "F-0268-2022",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0621-2023": {
+      "recall_number": "F-0621-2023",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-1862-2015": {
+      "recall_number": "F-1862-2015",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0634-2022": {
+      "recall_number": "F-0634-2022",
+      "category": "Dairy",
+      "confidence": "high"
+    },
+    "F-1578-2012": {
+      "recall_number": "F-1578-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-2195-2016": {
+      "recall_number": "F-2195-2016",
+      "category": "Produce",
+      "confidence": "medium"
+    },
+    "F-1069-2022": {
+      "recall_number": "F-1069-2022",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0723-2017": {
+      "recall_number": "F-0723-2017",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-0666-2016": {
+      "recall_number": "F-0666-2016",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0610-2022": {
+      "recall_number": "F-0610-2022",
+      "category": "Produce",
+      "confidence": "medium"
+    },
+    "F-0274-2020": {
+      "recall_number": "F-0274-2020",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1089-2020": {
+      "recall_number": "F-1089-2020",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1998-2012": {
+      "recall_number": "F-1998-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0618-2024": {
+      "recall_number": "F-0618-2024",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0730-2018": {
+      "recall_number": "F-0730-2018",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1270-2018": {
+      "recall_number": "F-1270-2018",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-2387-2012": {
+      "recall_number": "F-2387-2012",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1984-2012": {
+      "recall_number": "F-1984-2012",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0152-2013": {
+      "recall_number": "F-0152-2013",
+      "category": "Produce",
+      "confidence": "low"
+    },
+    "F-1754-2022": {
+      "recall_number": "F-1754-2022",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1567-2018": {
+      "recall_number": "F-1567-2018",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1114-2020": {
+      "recall_number": "F-1114-2020",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0489-2014": {
+      "recall_number": "F-0489-2014",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-2427-2014": {
+      "recall_number": "F-2427-2014",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1172-2022": {
+      "recall_number": "F-1172-2022",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "H-0259-2025": {
+      "recall_number": "H-0259-2025",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0539-2023": {
+      "recall_number": "F-0539-2023",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0339-2025": {
+      "recall_number": "F-0339-2025",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1189-2014": {
+      "recall_number": "F-1189-2014",
+      "category": "Spices/Condiments",
+      "confidence": "low"
+    },
+    "F-3346-2017": {
+      "recall_number": "F-3346-2017",
+      "category": "Nuts/Seeds",
+      "confidence": "medium"
+    },
+    "F-1025-2014": {
+      "recall_number": "F-1025-2014",
+      "category": "Prepared/Frozen",
+      "confidence": "medium"
+    },
+    "F-1254-2023": {
+      "recall_number": "F-1254-2023",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0675-2016": {
+      "recall_number": "F-0675-2016",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0676-2015": {
+      "recall_number": "F-0676-2015",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1731-2017": {
+      "recall_number": "F-1731-2017",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-1360-2014": {
+      "recall_number": "F-1360-2014",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-2511-2014": {
+      "recall_number": "F-2511-2014",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-0048-2013": {
+      "recall_number": "F-0048-2013",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "H-0112-2026": {
+      "recall_number": "H-0112-2026",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-0925-2013": {
+      "recall_number": "F-0925-2013",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-1353-2024": {
+      "recall_number": "F-1353-2024",
+      "category": "Spices/Condiments",
+      "confidence": "low"
+    },
+    "H-0157-2026": {
+      "recall_number": "H-0157-2026",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-0577-2018": {
+      "recall_number": "F-0577-2018",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "H-0473-2025": {
+      "recall_number": "H-0473-2025",
+      "category": "Seafood",
+      "confidence": "medium"
+    },
+    "F-2935-2017": {
+      "recall_number": "F-2935-2017",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-0208-2020": {
+      "recall_number": "F-0208-2020",
+      "category": "Seafood",
+      "confidence": "high"
+    },
+    "F-1643-2022": {
+      "recall_number": "F-1643-2022",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-0266-2021": {
+      "recall_number": "F-0266-2021",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-0261-2024": {
+      "recall_number": "F-0261-2024",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-1455-2018": {
+      "recall_number": "F-1455-2018",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "F-3066-2015": {
+      "recall_number": "F-3066-2015",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "H-0135-2026": {
+      "recall_number": "H-0135-2026",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-0560-2024": {
+      "recall_number": "F-0560-2024",
+      "category": "Dairy",
+      "confidence": "medium"
+    },
+    "F-1268-2017": {
+      "recall_number": "F-1268-2017",
+      "category": "Nuts/Seeds",
+      "confidence": "medium"
+    },
+    "F-2914-2015": {
+      "recall_number": "F-2914-2015",
+      "category": "Nuts/Seeds",
+      "confidence": "high"
+    },
+    "F-0246-2021": {
+      "recall_number": "F-0246-2021",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "H-0329-2025": {
+      "recall_number": "H-0329-2025",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0284-2020": {
+      "recall_number": "F-0284-2020",
+      "category": "Plant Protein",
+      "confidence": "low"
+    },
+    "F-1660-2024": {
+      "recall_number": "F-1660-2024",
+      "category": "Snacks/Candy",
+      "confidence": "high"
+    },
+    "H-0769-2026": {
+      "recall_number": "H-0769-2026",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-0127-2021": {
+      "recall_number": "F-0127-2021",
+      "category": "Produce",
+      "confidence": "medium"
+    },
+    "F-0331-2015": {
+      "recall_number": "F-0331-2015",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-2120-2015": {
+      "recall_number": "F-2120-2015",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1628-2014": {
+      "recall_number": "F-1628-2014",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-0429-2015": {
+      "recall_number": "F-0429-2015",
+      "category": "Supplements",
+      "confidence": "medium"
+    },
+    "F-0368-2015": {
+      "recall_number": "F-0368-2015",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-1586-2020": {
+      "recall_number": "F-1586-2020",
+      "category": "Spices/Condiments",
+      "confidence": "medium"
+    },
+    "F-1421-2020": {
+      "recall_number": "F-1421-2020",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1950-2015": {
+      "recall_number": "F-1950-2015",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1989-2015": {
+      "recall_number": "F-1989-2015",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-1985-2015": {
+      "recall_number": "F-1985-2015",
+      "category": "Spices/Condiments",
+      "confidence": "high"
+    },
+    "F-0937-2017": {
+      "recall_number": "F-0937-2017",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0482-2015": {
+      "recall_number": "F-0482-2015",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0352-2015": {
+      "recall_number": "F-0352-2015",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0565-2016": {
+      "recall_number": "F-0565-2016",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-1311-2014": {
+      "recall_number": "F-1311-2014",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0951-2020": {
+      "recall_number": "F-0951-2020",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0328-2024": {
+      "recall_number": "F-0328-2024",
+      "category": "Supplements",
+      "confidence": "medium"
+    },
+    "F-0197-2021": {
+      "recall_number": "F-0197-2021",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1044-2017": {
+      "recall_number": "F-1044-2017",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-3369-2017": {
+      "recall_number": "F-3369-2017",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-1565-2023": {
+      "recall_number": "F-1565-2023",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0708-2025": {
+      "recall_number": "F-0708-2025",
+      "category": "Bakery",
+      "confidence": "medium"
+    },
+    "F-0847-2016": {
+      "recall_number": "F-0847-2016",
+      "category": "Bakery",
+      "confidence": "high"
+    },
+    "F-1222-2023": {
+      "recall_number": "F-1222-2023",
+      "category": "Food Additives/Ingredients",
+      "confidence": "low"
+    },
+    "F-1092-2016": {
+      "recall_number": "F-1092-2016",
+      "category": "Produce",
+      "confidence": "low"
+    },
+    "F-3171-2017": {
+      "recall_number": "F-3171-2017",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-0759-2019": {
+      "recall_number": "F-0759-2019",
+      "category": "Snacks/Candy",
+      "confidence": "low"
+    },
+    "F-0988-2016": {
+      "recall_number": "F-0988-2016",
+      "category": "Beef/Pork/Poultry/Game Meats",
+      "confidence": "high"
+    },
+    "F-0134-2022": {
+      "recall_number": "F-0134-2022",
+      "category": "Plant Protein",
+      "confidence": "low"
+    },
+    "F-0989-2024": {
+      "recall_number": "F-0989-2024",
+      "category": "Grains/Cereal",
+      "confidence": "high"
+    },
+    "F-1337-2019": {
+      "recall_number": "F-1337-2019",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-3008-2017": {
+      "recall_number": "F-3008-2017",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "H-1079-2026": {
+      "recall_number": "H-1079-2026",
+      "category": "Supplements",
+      "confidence": "high"
+    },
+    "F-0231-2024": {
+      "recall_number": "F-0231-2024",
+      "category": "Prepared/Frozen",
+      "confidence": "high"
+    },
+    "F-0710-2013": {
+      "recall_number": "F-0710-2013",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-0680-2022": {
+      "recall_number": "F-0680-2022",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-1640-2016": {
+      "recall_number": "F-1640-2016",
+      "category": "Plant Protein",
+      "confidence": "high"
+    },
+    "F-1639-2023": {
+      "recall_number": "F-1639-2023",
+      "category": "Bakery",
+      "confidence": "low"
+    },
+    "F-0776-2022": {
+      "recall_number": "F-0776-2022",
+      "category": "Produce",
+      "confidence": "high"
+    },
+    "F-0665-2023": {
+      "recall_number": "F-0665-2023",
+      "category": "Produce",
+      "confidence": "medium"
+    },
+    "F-3072-2017": {
+      "recall_number": "F-3072-2017",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-1639-2017": {
+      "recall_number": "F-1639-2017",
+      "category": "Beverages",
+      "confidence": "high"
+    },
+    "F-1904-2014": {
+      "recall_number": "F-1904-2014",
+      "category": "Grains/Cereal",
+      "confidence": "medium"
+    },
+    "F-1176-2019": {
+      "recall_number": "F-1176-2019",
+      "category": "Snacks/Candy",
+      "confidence": "medium"
+    },
+    "F-1515-2014": {
+      "recall_number": "F-1515-2014",
+      "category": "Spices/Condiments",
+      "confidence": "low"
+    }
+  }
+}
