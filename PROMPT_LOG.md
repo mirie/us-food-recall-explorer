@@ -739,3 +739,37 @@ standalone function, so testing through `load_recalls` was the only way
 to exercise the real derivation logic). Full `.venv/bin/pytest` green, no
 `--continue-on-collection-errors` needed; `categories.py`'s 31 tests
 untouched.
+
+> Read the master plan's "Step 6 — QA and edge cases" section, BUILD_LOG.md
+> Entry 25, and HANDOFF_PHASE5.md's QA notes. Steps 1-5 are done and
+> committed. Do Step 6: live QA against the reclassified distribution via
+> `streamlit run app.py`, driven with browser tooling — filter matrix
+> (Year x Category x Reason x Severity, alone and combined, including a
+> small-but-nonzero case), lens sync across every filter state, the full
+> 2012-2026 range including the partial-2026 dashed segment, the error UI
+> (break the CSV path, confirm st.error()+st.stop(), restore), cold start
+> under 5 seconds, and the named edge cases (2012 alone; a fresh
+> zero-result combination since Dairy+Botulism+Class III may no longer
+> zero-result post-reclassification; clearing all filters; Uncategorized
+> and Other-reason selected explicitly). Every category in the approved
+> taxonomy should appear with sane counts. Any real gap: failing test
+> first, then a small patch. Standing instruction: update
+> BUILD_LOG.md/LEARNINGS.md/PROMPT_LOG.md and commit along the way,
+> staging only what each commit's diff touches. Leave the app running at
+> the end.
+
+No Playwright MCP or `chromium-cli` was available in this session;
+`playwright`'s Python sync API was already installed in `.venv`, so used
+that directly to drive the running app, screenshot each state, and cross-
+check every displayed event count against `apply_filters(df,
+...)["event_id"].nunique()` computed independently. All 13 checked filter
+states matched exactly. `Dairy`+`Botulism risk`+`Class III` still
+zero-results post-reclassification (confirmed rather than assumed); used
+`Pet Food/Treats`+`Salmonella` as the required fresh zero-result case.
+Cold start measured at 4.0s, under the PRD's 5-second target. Found one
+real gap: the missing-snapshot error message (and its mirror in
+`test_schema_guardrail.py`) still told users to run only `fetch_data.py`,
+which no longer rebuilds the file `DATA_PATH` points at post-Step-4 —
+fixed via TDD (new failing test, then patched both messages to name
+`build_classified_dataset.py` too). Full `.venv/bin/pytest` green; app
+restored and left running on `localhost:8501`.

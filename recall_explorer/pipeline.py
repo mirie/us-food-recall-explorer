@@ -39,7 +39,7 @@ def load_recalls(path=None):
     if not path.exists():
         raise ValueError(
             f"Data snapshot not found at {path}. "
-            f"Run `python fetch_data.py` to build it."
+            f"Run `python fetch_data.py` then `python build_classified_dataset.py` to build it."
         )
 
     df = pd.read_csv(path, dtype=str)

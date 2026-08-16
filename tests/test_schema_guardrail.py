@@ -27,7 +27,8 @@ def raw():
 
 def test_snapshot_file_exists():
     assert DATA_PATH.exists(), (
-        f"{DATA_PATH} is missing. Run: python fetch_data.py"
+        f"{DATA_PATH} is missing. Run: python fetch_data.py "
+        f"then python build_classified_dataset.py"
     )
 
 

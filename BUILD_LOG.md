@@ -1863,3 +1863,82 @@ is next.
 ~30 minutes: test rewrites, About section, verification, logging.
 
 ---
+
+## Entry 26 — Phase 5 Step 6: live QA against the reclassified distribution
+
+**Goal**
+Run the plan's Step 6 QA checklist live against `streamlit run app.py` --
+filter matrix, lens sync, full date range, error UI, cold start, and the
+named edge cases -- and fix any real gap found, TDD-first.
+
+**What I built**
+No browser-automation tool (Playwright MCP/`chromium-cli`) was available
+in this session, so I drove the running app with `playwright`'s
+Python sync API directly (already installed in `.venv`) via one-off
+scripts in the scratchpad, screenshotting each state and cross-checking
+every "Total recall events" figure against `apply_filters(df,
+...)["event_id"].nunique()` computed independently in a plain Python
+shell -- the same ground truth the UI is supposed to reflect.
+
+Checked live: Category/Reason/Severity alone and combined (including a
+4-dimension small-but-nonzero case, Seafood + 2018-2020 + Listeria + Class
+I = 22 events); both lenses (event/product) in sync at every filter state
+via the Seasonality and Top-recalled-foods panels; the full 2012-2026
+range with the trend chart's dashed partial-2026 segment; 2012 alone (515
+events); 2026 alone (231 events, partial); `Dairy` + `Botulism risk` +
+`Class III` -- still zero-results post-reclassification, confirmed by
+direct query rather than assumed; a fresh zero-result combination other
+than that one (`Pet Food/Treats` + `Salmonella` = 0); clearing all filters
+back to the full 7,789-event baseline; `Uncategorized` + `Other` reason
+selected explicitly (16 events, renders normally, no residual-bucket
+special-casing needed); all 21 approved-taxonomy categories present with
+sane counts in both lenses' bar charts, including `Eggs` (64 events / 142
+rows), `Beef/Pork/Poultry/Game Meats` (56 events / 156 rows), and
+`Pet Food/Treats` (4 events / 6 rows). Cold start measured at 4.0s
+(process start to Key Insights data visible in the browser) against the
+PRD's 5-second target.
+
+Every one of the 13 checked filter states matched its independently
+computed expected event count exactly -- no discrepancies found in the
+filter/lens/derivation logic itself.
+
+**What worked**
+Cross-checking the UI against an independently computed ground truth
+(rather than eyeballing numbers) caught the one real gap below with
+certainty rather than suspicion. Screenshots at generous viewport heights
+(`full_page=True` with a tall viewport) avoided the scroll-position
+flakiness of driving a real scroll.
+
+**What broke**
+The error-UI path (`mv data/food_recalls_classified.csv{,.bak}`, restart
+the server since `@st.cache_data` memoizes `get_data()` per-process and
+would otherwise mask a missing file on a live process) rendered
+`st.error()` + `st.stop()` correctly, but the message itself was stale:
+"Run `python fetch_data.py` to build it." `DATA_PATH` has pointed at the
+Phase 5 derived file since Step 4 -- built by `fetch_data.py` *and then*
+`build_classified_dataset.py` (see `pipeline.py`'s own module docstring).
+A user hitting this error and following its instructions would run
+`fetch_data.py`, watch it succeed, and land on the exact same error again,
+because the derived file `load_recalls()` actually reads still wouldn't
+exist. `tests/test_schema_guardrail.py::test_snapshot_file_exists` carried
+the identical stale message in its own assertion.
+
+**What I changed**
+TDD: added `test_missing_snapshot_error_names_build_classified_dataset` to
+`tests/test_pipeline.py`, watched it fail with the old message, then
+updated both `pipeline.py`'s raised `ValueError` and
+`test_schema_guardrail.py`'s `test_snapshot_file_exists` assertion message
+to name both scripts in order. Restored `food_recalls_classified.csv` and
+restarted the server to confirm the app returns to normal before leaving
+it running.
+
+**Open questions**
+None. All Step 6 checklist items completed live; the one real gap found
+has a regression test and a fix; `.venv/bin/pytest` fully green; the app
+is left running on `localhost:8501`.
+
+**Time spent**
+~1.5 hours: driver scripts, ground-truth cross-checks, screenshots, the
+error-UI gap's TDD cycle, logging.
+
+---

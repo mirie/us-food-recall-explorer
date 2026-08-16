@@ -168,3 +168,16 @@ def test_no_keyword_inference_at_load_time(tmp_path):
 def test_classified_csv_has_llm_category_for_essentially_every_row(df):
     missing_share = (df["llm_category"].isna() | (df["llm_category"].str.strip() == "")).mean()
     assert missing_share < 0.001
+
+
+# --- Missing snapshot ---------------------------------------------------
+
+def test_missing_snapshot_error_names_build_classified_dataset(tmp_path):
+    # DATA_PATH is the Phase 5 derived file, produced by fetch_data.py *and
+    # then* build_classified_dataset.py -- see pipeline.py's module docstring.
+    # Telling a user to run only fetch_data.py leaves them stuck: that script
+    # regenerates the raw snapshot, not the derived file load_recalls() reads,
+    # so the same error recurs.
+    missing_path = tmp_path / "food_recalls_classified.csv"
+    with pytest.raises(ValueError, match="build_classified_dataset.py"):
+        load_recalls(missing_path)
