@@ -9,6 +9,11 @@ PRODUCTS = "products"
 EVENTS = "events"
 LENSES = (EVENTS, PRODUCTS)
 
+# Fixed display/sort order for the severity trend -- Class I is most severe.
+# A value outside this set (data drift, an unexpected classification) is
+# still appended rather than dropped, so it surfaces instead of vanishing.
+SEVERITY_ORDER = ("Class I", "Class II", "Class III")
+
 # Plausibility window for a recall date. openFDA's enforcement reports begin in
 # 2012; anything outside this range is a data-entry artifact, not a real recall.
 MIN_PLAUSIBLE_YEAR = 2000
@@ -123,4 +128,51 @@ def count_by(df, dimension, lens):
         counted.rename("count")
         .reset_index()
         .sort_values("count", ascending=False, ignore_index=True)
+    )
+
+
+def severity_trend(df, lens, coverage_end=None):
+    """Long-form (year, classification, count, partial) grid for the trend chart.
+
+    Every year present in `df` crossed with every classification -- both the
+    three expected values in `SEVERITY_ORDER` and any others actually
+    observed, so a data-drift value is appended rather than silently
+    dropped. Missing (year, classification) combinations are real zeros, not
+    holes -- a gap in a line chart would be indistinguishable from a bug.
+
+    `partial` marks a year whose December falls beyond `coverage_end` --
+    same (year, month) key arithmetic as `seasonality_matrix()`'s `covered`
+    flag, inverted: a year is partial rather than fully observed. Defaults to
+    the last (year, month) present in `df`, same as `seasonality_matrix()`.
+    """
+    _validate_lens(lens)
+
+    if coverage_end is None:
+        coverage_end = (int(df["year"].max()), int(df["month"].max()))
+    coverage_end_key = coverage_end[0] * 12 + coverage_end[1]
+
+    if lens == EVENTS:
+        counted = df.groupby(["year", "classification"])["event_id"].nunique()
+    else:
+        counted = df.groupby(["year", "classification"]).size()
+    counted = counted.rename("count")
+
+    observed_classes = [c for c in df["classification"].unique() if c not in SEVERITY_ORDER]
+    classifications = list(SEVERITY_ORDER) + sorted(observed_classes)
+
+    years = range(int(df["year"].min()), int(df["year"].max()) + 1)
+    class_order = {c: i for i, c in enumerate(classifications)}
+    grid = pd.DataFrame(
+        [(year, c) for year in years for c in classifications],
+        columns=["year", "classification"],
+    )
+
+    grid = grid.merge(counted.reset_index(), on=["year", "classification"], how="left")
+    grid["count"] = grid["count"].fillna(0).astype(int)
+    grid["partial"] = (grid["year"] * 12 + 12) > coverage_end_key
+    grid["_class_order"] = grid["classification"].map(class_order)
+
+    return (
+        grid.sort_values(["year", "_class_order"], ignore_index=True)
+        .drop(columns="_class_order")
     )

@@ -6,7 +6,12 @@ Hand-built DataFrames only -- these never touch data/food_recalls.csv.
 import pandas as pd
 import pytest
 
-from recall_explorer.transforms import count_by, parse_recall_dates, seasonality_matrix
+from recall_explorer.transforms import (
+    count_by,
+    parse_recall_dates,
+    seasonality_matrix,
+    severity_trend,
+)
 
 
 def test_yyyymmdd_string_becomes_a_real_date():
@@ -170,3 +175,102 @@ def test_grid_is_rectangular_across_the_full_year_span():
 def test_invalid_lens_raises():
     with pytest.raises(ValueError):
         seasonality_matrix(SEASONALITY_FIXTURE, lens="nonsense")
+
+
+# --- The severity trend grid ------------------------------------------------
+# Four product rows across four events and two years:
+#
+#   2020  E1 x2, E2 x1   all Class I -- product lens sees 3 rows, event lens
+#                        sees 2 distinct events; the lenses must disagree here
+#   2021  E3 x1          Class II
+#   2021  E4 x1          "Mystery" -- a classification value the app doesn't
+#                        expect, which must still surface rather than vanish
+#
+# 2020 has no Class II/III/Mystery rows and 2021 has no Class I/III rows --
+# both must read as real zeros, not missing cells.
+
+TREND_FIXTURE = pd.DataFrame({
+    "event_id": ["E1", "E1", "E2", "E3", "E4"],
+    "year": [2020, 2020, 2020, 2021, 2021],
+    "month": [3, 3, 6, 1, 9],
+    "classification": ["Class I", "Class I", "Class I", "Class II", "Mystery"],
+})
+
+
+def trend_cell(trend, year, classification):
+    match = trend[(trend["year"] == year) & (trend["classification"] == classification)]
+    assert len(match) == 1, f"expected exactly one row for {year}/{classification}"
+    return match.iloc[0]
+
+
+def test_product_lens_counts_every_row_in_its_cell_trend():
+    trend = severity_trend(TREND_FIXTURE, lens="products")
+    assert trend_cell(trend, 2020, "Class I")["count"] == 3
+
+
+def test_event_lens_counts_distinct_events_not_rows_trend():
+    trend = severity_trend(TREND_FIXTURE, lens="events")
+    assert trend_cell(trend, 2020, "Class I")["count"] == 2
+
+
+def test_the_two_lenses_disagree_on_a_multi_product_event():
+    products = severity_trend(TREND_FIXTURE, lens="products")
+    events = severity_trend(TREND_FIXTURE, lens="events")
+    assert products["count"].sum() == 5
+    assert events["count"].sum() == 4
+
+
+def test_grid_is_rectangular_across_years_and_classifications():
+    # 2 years x 4 classifications (Class I/II/III plus the unexpected
+    # "Mystery" value) = 8 rows, not just the combinations with data.
+    trend = severity_trend(TREND_FIXTURE, lens="events")
+    assert len(trend) == 8
+    for year in (2020, 2021):
+        classes = sorted(trend.loc[trend["year"] == year, "classification"])
+        assert classes == ["Class I", "Class II", "Class III", "Mystery"]
+
+
+def test_class_with_no_rows_in_a_year_is_a_real_zero():
+    trend = severity_trend(TREND_FIXTURE, lens="events")
+    assert trend_cell(trend, 2020, "Class II")["count"] == 0
+    assert trend_cell(trend, 2021, "Class I")["count"] == 0
+
+
+def test_unexpected_classification_value_is_not_silently_dropped():
+    trend = severity_trend(TREND_FIXTURE, lens="events")
+    assert trend_cell(trend, 2021, "Mystery")["count"] == 1
+
+
+def test_year_past_coverage_end_is_marked_partial():
+    # Fixture's last row is 2021-09; if coverage only extends through July,
+    # 2021 is a partial year -- it hasn't reached December yet.
+    trend = severity_trend(TREND_FIXTURE, lens="events", coverage_end=(2021, 7))
+    row = trend_cell(trend, 2021, "Class II")
+    assert row["partial"] is True or row["partial"] == True  # noqa: E712
+
+
+def test_year_reaching_december_is_not_partial():
+    trend = severity_trend(TREND_FIXTURE, lens="events", coverage_end=(2021, 12))
+    row = trend_cell(trend, 2021, "Class II")
+    assert row["partial"] is False or row["partial"] == False  # noqa: E712
+
+
+def test_coverage_end_defaults_to_the_last_month_present_in_df_trend():
+    # No coverage_end given -- fixture's last row is 2021-09, so 2021 hasn't
+    # reached December and must default to partial.
+    trend = severity_trend(TREND_FIXTURE, lens="events")
+    row = trend_cell(trend, 2021, "Class II")
+    assert row["partial"] is True or row["partial"] == True  # noqa: E712
+    row_2020 = trend_cell(trend, 2020, "Class I")
+    assert row_2020["partial"] is False or row_2020["partial"] == False  # noqa: E712
+
+
+def test_rows_ordered_by_year_then_severity_order():
+    trend = severity_trend(TREND_FIXTURE, lens="events", coverage_end=(2021, 12))
+    year_2020 = list(trend.loc[trend["year"] == 2020, "classification"])
+    assert year_2020[:3] == ["Class I", "Class II", "Class III"]
+
+
+def test_invalid_lens_raises_trend():
+    with pytest.raises(ValueError):
+        severity_trend(TREND_FIXTURE, lens="nonsense")

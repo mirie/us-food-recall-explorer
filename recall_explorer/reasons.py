@@ -48,6 +48,11 @@ REASON_RULES = [
 ]
 
 
+# Derived, not hand-copied -- the reason filter's option list must stay in
+# sync if a rule is ever added to REASON_RULES above.
+REASON_LABELS = [label for label, _pattern in REASON_RULES]
+
+
 def tag_reasons(reason_text):
     """Return every reason label whose pattern appears in the text.
 
