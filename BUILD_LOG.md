@@ -1585,3 +1585,86 @@ plan, pending Mai's go-ahead.
 verifying completeness, documenting the failure mode.
 
 ---
+
+## Entry 22 — Phase 5 Step 3b: six validation checks
+
+**Goal**
+Run the master plan's Step 3b validation gate against the full 29,159-row
+classification from Entry 21 before Step 4's pipeline refactor: self-
+consistency, agreement with the manually-reviewed residual, confidence
+triage, category coherence, keyword-vs-LLM disagreement, and residual
+inspection.
+
+**What I built**
+`scratch/self_consistency_check.py` (not checked in): re-classifies a
+1,000-row random sample (seed `20260816`) in a second, independent Batch
+API run, reusing `classify_all.py`'s exact request-shaping helpers.
+Submitted, polled, and fetched cleanly (0 missing, 0 unexpected against
+the sample).
+
+**Results**
+
+1. **Self-consistency** (1,000 rows, second independent pass): **96.1%
+   agreement** (961/1,000). All 39 disagreements landed on first-pass
+   `medium` (20) or `low` (19) confidence rows -- zero disagreements
+   among `high`-confidence rows. Confidence is a real, calibrated signal
+   of the accuracy ceiling, not decoration.
+2. **Agreement with the 3,554 manually-reviewed rows**
+   (`data/recall_categories_llm_classified.csv`, the Phase 3 residual
+   pass): **87.7% raw agreement** (3,118/3,554). Of the 436 raw
+   disagreements: 41 are taxonomy expansions into labels the old 18-label
+   set didn't have (`Eggs`, `Baby/Toddler Food`, `Pet Food/Treats`); 116
+   are old-real-category rows the new pass moved to `Uncategorized` (111
+   of those at `low` confidence -- hand-reviewed, and they're bare/
+   ambiguous descriptions like "Nano Papa," "Placenta," "SOD" that the
+   old manual pass over-guessed on, not new-pass errors); 20 are old-
+   `Uncategorized` rows the new pass resolved to a real category
+   (improvement); 259 are true swaps among shared labels, explained by
+   coverage rules added since the old pass (coffee creamer, formula,
+   batter mix, cooked-bean dishes).
+3. **Confidence triage**: reviewed a 10-per-category stratified sample of
+   the 1,643 `low`-confidence rows outside `Uncategorized`, plus the full
+   confidence-by-category breakdown. No misclassifications found --
+   `low` correctly flags genuinely thin or boundary descriptions. Highest
+   `low`-confidence shares match the doc's own Known Gaps section:
+   `Baking Supplies` 37.3%, `Food Additives/Ingredients` 26.8%,
+   `Beef/Pork/Poultry/Game Meats` 23.7%.
+4. **Category coherence**: 15 random descriptions per category, all 21
+   categories (315 total), eyeballed. All coherent -- no category
+   absorbing junk, no repeat of the keyword-era "clamshell -> Seafood"
+   bug class.
+5. **Keyword-vs-LLM disagreement**: ran `categories.py`'s
+   `assign_category()` against every description and compared to the LLM
+   label per category. Lowest agreement -- `Beef` 18.5%, `Pork` 26.1%,
+   `Poultry/Eggs` 37.5%, `Grains/Cereal` 39.2% -- lands exactly on the
+   failure classes `categories.py`'s own docstring predicted (meat words
+   read as flavoring/ingredient, an FDA-vs-USDA jurisdiction artifact,
+   not a product signal). Highest agreement: `Supplements` 88.3%,
+   `Plant Protein` 83.6%, `Seafood` 80.7%, `Oils/Fats` 78.0%.
+6. **Residual inspection**: read all 231 `Uncategorized` rows in full.
+   Overwhelmingly bare SKUs/item codes, gift baskets and assortments, and
+   unlabeled bulk shipments -- matches the taxonomy's own definition of
+   the label. Found one systematic miss: **13 rows** matching the exact
+   `"BATTER MIX X1, 50 LBS"`-style bare-code pattern that
+   `CLASSIFICATION_RULES.md`'s Grains/Cereal rule explicitly covers by
+   worked example (489 rows total match that pattern dataset-wide; only
+   these 13, all from the same manufacturer's 2023 filings, were missed).
+
+**What I changed**
+Patched the 13 batter-mix/breader rows directly in
+`data/recall_categories_llm_full.csv`: `Uncategorized` -> `Grains/Cereal`,
+confidence `high` (the rule match is unambiguous). `Uncategorized` share
+after the fix: **218/29,159 (0.75%)**, down from 231 (0.79%). Recorded
+all six results in `data/fetch_metadata.json`'s new
+`llm_classification_pass.step_3b_validation` block.
+
+**Verdict**
+All six checks pass. No systemic issues beyond the one fixed. Step 4
+(pipeline refactor) is cleared to proceed.
+
+**Time spent**
+~55 minutes: submitting and polling the self-consistency batch, six
+checks' worth of comparison scripts and manual review, the batter-mix
+patch, documentation.
+
+---

@@ -48,5 +48,50 @@
     "center_classification_date",
     "report_date",
     "termination_date"
-  ]
+  ],
+  "llm_classification_pass": {
+    "description": "Phase 5: full-dataset LLM reclassification via classify_all.py, superseding the Phase 3 manual round trip that covered only the 3,554-row (12.2%) Uncategorized residual.",
+    "classified_at_utc": "2026-08-15",
+    "model": "claude-opus-5",
+    "method": "Message Batches API, effort=high, structured JSON output",
+    "row_count": 29159,
+    "taxonomy_doc": "CLASSIFICATION_RULES.md",
+    "taxonomy_label_count": 21,
+    "uncategorized_share_before": "12.2% (3554/29161, keyword pass)",
+    "uncategorized_share_after": "0.75% (218/29159, post Step 3b fix)",
+    "confidence_distribution": {
+      "high": "64.5% (18801/29159)",
+      "medium": "29.9% (8715/29159)",
+      "low": "5.6% (1643/29159)"
+    },
+    "step_3b_validation": {
+      "1_self_consistency": {
+        "method": "Independent second Batch API pass over 1,000 randomly sampled rows (seed 20260816), compared to the first pass.",
+        "agreement": "96.1% (961/1000)",
+        "finding": "All 39 disagreements fell on first-pass medium (20) or low (19) confidence rows -- zero disagreements among high-confidence rows. Confidence is a reliable signal of the realistic accuracy ceiling."
+      },
+      "2_agreement_with_reviewed_rows": {
+        "method": "Compared against data/recall_categories_llm_classified.csv, the 3,554-row manual Phase 3 pass over the original Uncategorized residual.",
+        "raw_agreement": "87.7% (3118/3554)",
+        "finding": "Of the 436 raw disagreements: 41 are taxonomy expansions into labels that didn't exist in the old 18-label set (Eggs, Baby/Toddler Food, Pet Food/Treats); 116 are old-real-category rows the new pass moved to Uncategorized (111/116 low confidence -- reviewed by hand, these are bare/ambiguous descriptions the old manual pass over-guessed on, e.g. 'Nano Papa', 'Placenta', 'SOD'); 20 are old-Uncategorized rows the new pass resolved to a real category (improvement); 259 are true swaps among shared labels, explained by coverage rules added since the old pass (coffee creamer, formula, batter mix, cooked-bean dishes)."
+      },
+      "3_confidence_triage": {
+        "method": "Reviewed a stratified sample (10/category) of the 1,643 low-confidence rows outside Uncategorized, plus the full confidence breakdown by category.",
+        "finding": "No misclassifications found. Low confidence correctly flags genuinely thin or boundary-case descriptions (bare SKUs, novel/international products). Highest low-confidence shares match the doc's own Known Gaps: Baking Supplies 37.3%, Food Additives/Ingredients 26.8%, Beef/Pork/Poultry/Game Meats 23.7%."
+      },
+      "4_category_coherence": {
+        "method": "15 random product descriptions printed per category, all 21 categories (315 total), eyeballed for a category absorbing junk.",
+        "finding": "All 21 categories coherent. No repeat of the 'clamshell -> Seafood' keyword-era bug class."
+      },
+      "5_keyword_vs_llm_disagreement": {
+        "method": "Ran categories.py's assign_category() keyword rules against every description, compared to the LLM label per category (with Beef/Pork/Poultry/Eggs mapped onto the merged Beef/Pork/Poultry/Game Meats + Eggs labels).",
+        "finding": "Lowest agreement: Beef 18.5%, Pork 26.1%, Poultry/Eggs 37.5%, Grains/Cereal 39.2% -- exactly the failure classes categories.py's own docstring predicted (meat words read as flavoring/ingredient, not product, per FDA-vs-USDA jurisdiction). Highest agreement: Supplements 88.3%, Plant Protein 83.6%, Seafood 80.7%, Oils/Fats 78.0%."
+      },
+      "6_residual_inspection": {
+        "method": "Read all 231 Uncategorized rows' full product descriptions.",
+        "finding": "Overwhelmingly bare SKUs/item codes, gift baskets and assortments, and unlabeled bulk shipments -- matches the taxonomy's own Uncategorized definition. Found one systematic miss: 13 rows matching the exact 'BATTER MIX X1, 50 LBS'-style bare-code pattern the Grains/Cereal rule's worked example explicitly covers. Patched directly to Grains/Cereal (confidence: high) in data/recall_categories_llm_full.csv. Residual after fix: 218 rows (0.75%)."
+      },
+      "verdict": "All six checks pass. No systemic issues beyond the one fixed (13 rows). Step 4 (pipeline refactor) is cleared to proceed."
+    }
+  }
 }
