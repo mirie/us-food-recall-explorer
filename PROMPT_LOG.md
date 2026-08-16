@@ -800,3 +800,67 @@ Filters section, which turned out to have never been committed at all
 directly rather than guess whether to commit all of app.py now or leave
 it uncommitted again; Mai chose to commit it now, and noted she was
 disappointed it had been sitting uncommitted for as long as it had.
+
+> "Okay I would like to add a couple of learnings as well. One I want to
+> make sure that the learnings.md file has the git status check learning
+> -- as this was a massive commit of the app at the end which is the
+> opposite of what I wanted."
+
+Sent mid-review of the `SUBMISSION_DRAFT.md` draft, after noticing the
+draft's Learnings section didn't cover the uncommitted-`app.py` incident
+above. Added a dedicated `LEARNINGS.md` section on it (a working app is
+not evidence of a committed app; the fix was a standing session-end
+`git status`-clean checklist item, not a smarter commit habit) and
+propagated the same point into `SUBMISSION_DRAFT.md`.
+
+> "Also high level, big picture project learnings:
+> - It took me the longest to plan -- planning phases took a lonnng time.
+>   That includes the brainstorming phase too
+> - I attempted to try this in parallel on ChatGPT but I ran into a limit
+>   and could not continue on the free tier (reset was to be in September)
+> - I also added a lot of scope to the assignment to try things I've been
+>   wanted to try out: ChatPRD, remote control with a claude session,
+>   using the Claude API, TDD with AI-coded app, playwright QA
+> - I realized that sometimes the plan docs were so full of information
+>   and long that I didn't review it thoroughly enough. I did review the
+>   llm classification + API plan pretty thoroughly since that was going
+>   to cost me money
+> - I was frequently blocked by session limits. This might be a signal to
+>   me that I'm not being effective in terms of token spend when using
+>   Claude."
+
+Five reflections on the process itself, not any specific build decision —
+these don't live anywhere in the existing chronological record because
+they're about the assignment as a whole rather than any one entry. Added
+as a new "Big-picture project learnings (author's own reflections, added
+at submission time)" section in `LEARNINGS.md`, and folded into
+`SUBMISSION_DRAFT.md`'s Learnings section as its own subsection.
+
+> "yeah, 'Whether the file-delivery saga (SendUserFile → Artifact →
+> clipboard) deserves its own Iterations subsection rather than being
+> folded into Learnings.' I learned that this approach was not effective
+> and also the miscommunication / my miss in reading the plan really
+> affected and elongated the process"
+
+Answered one of the draft's own flagged editorial questions, and added
+two learnings the draft hadn't captured: the manual round-trip approach
+itself was the wrong call (not just three failed delivery attempts), and
+the real cost was `HANDOFF_PHASE5_LLM_MERGE.md`'s scoping assumption
+going unverified despite being read and approved — the two full sessions
+spent on the wrong 12% of the data, not the delivery failures, is what
+actually elongated this part of the build. Gave the file-delivery saga
+its own Section 4 subsection in `SUBMISSION_DRAFT.md`, added a matching
+`LEARNINGS.md` section, and resolved the corresponding open editorial
+question inline.
+
+> "Can you add more to the prompt session? I do like the story arc
+> approach and feel like we should add those" [re: Phase 5 taxonomy
+> revision round prompts]
+
+Answered the draft's second flagged editorial question, confirming the
+story-arc curation style should extend to more of the Phase 5 taxonomy
+work. Added a "Phase 5 taxonomy revision rounds" subsection to
+`SUBMISSION_DRAFT.md`'s Prompts section with six more quotes pulled
+from `PROMPT_LOG.md`'s Phase 5 sessions, in the same one-quote-per-pivot
+format as the rest of the section, and resolved the corresponding open
+editorial question inline.

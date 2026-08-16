@@ -2005,3 +2005,112 @@ None.
 ~25 minutes: TDD cycle, live verification, the staging question, logging.
 
 ---
+
+## Entry 28 — Phase 5 submission draft: synthesizing the Google Doc content
+
+**Goal**
+Per the PRD's "Process & Documentation Requirements" section and
+`HANDOFF_PHASE5.md`'s deliverable 3, draft the content for the final
+submission artifact (an external Google Doc, not a repo file) covering
+project overview, datasets used, prompts used, iterations tried, and
+learnings/observations. Draft it first as `SUBMISSION_DRAFT.md` in the repo
+for review before anything is pasted externally — this is synthesis of
+already-committed material, not new source work.
+
+**What I built**
+`SUBMISSION_DRAFT.md` — five sections (Overview, Datasets Used, Prompts
+Used, Iterations Tried, Learnings & Observations) plus an editorial-notes
+closing section flagging judgment calls made while trimming source
+material. Synthesized from `BUILD_LOG.md` (all 27 entries), `PROMPT_LOG.md`,
+`LEARNINGS.md`, the PRD, and `CLASSIFICATION_RULES.md`. No app code
+touched.
+
+**What worked**
+Spot-checking the draft's more specific claims (exact quotes, the 96.1%
+self-consistency figure, the 211/29,159 = 0.72% Uncategorized figure, the
+419-row/16-of-292-chunks batch bug, the 58-probe/~20-mislabeled figure)
+against the source files directly confirmed all of them accurate — no
+fabricated numbers or misattributed quotes, which mattered more than usual
+given this exact project's own documented history of a fabricated
+docstring example (Entry 2.6) propagating unchecked through five documents.
+
+**What broke**
+Nothing in the draft itself, but Mai flagged two real gaps in it during
+review, in two separate rounds:
+
+1. `LEARNINGS.md` didn't yet have an entry for the uncommitted-`app.py`
+   incident (Entry 27) — the exact opposite of what she wanted, since
+   five sessions' worth of app code had sat uncommitted before anyone
+   checked. The draft's Learnings section had been synthesized from
+   `LEARNINGS.md` as it stood, so the gap in the source propagated
+   straight into the draft.
+2. A set of high-level, author-only reflections that live nowhere in the
+   existing build record because they're about the *process of doing the
+   assignment*, not about any specific build decision: planning took the
+   longest phase by far; a parallel ChatGPT attempt hit a free-tier limit
+   not resetting until September; scope was deliberately expanded beyond
+   the assignment to get hands-on with ChatPRD, Remote Control, the
+   Claude API, TDD-on-AI-code, and Playwright QA; plan documents past a
+   certain length got noticeably less scrutiny (except the one costing
+   real money); and repeated session-limit blocks are a signal about her
+   own token-spend effectiveness, not just friction.
+
+**What I changed**
+Added two new `LEARNINGS.md` sections: "the uncommitted-`app.py` problem:
+a working tree is not a project history," and "Big-picture project
+learnings (author's own reflections, added at submission time)" covering
+the five points above. Propagated both into `SUBMISSION_DRAFT.md`'s
+Learnings section (a new "Big-picture reflections" subsection alongside
+the existing "What worked" / "What was harder" / "Meta-observations"
+ones) so the draft stays in sync with its own source.
+
+Third round: Mai answered one of the draft's own flagged editorial
+questions — whether the file-delivery saga deserved its own Iterations
+subsection — and added two more real learnings on top of the yes: the
+manual round-trip approach was ineffective in its own right, not just
+poorly delivered, and a miscommunication (the merge plan's scoping
+assumption going unverified despite being read and approved) elongated
+the process more than the delivery failures did.
+
+**What I changed (round 3)**
+Added a new Section 4 subsection to `SUBMISSION_DRAFT.md` ("The
+manual-round-trip approach itself: an ineffective detour, not just a
+delivery problem") covering the three-attempt delivery saga, the
+argument that the round trip was the wrong approach regardless of
+delivery mechanics, and the plan-review-vs-plan-verification gap. Added
+a matching `LEARNINGS.md` section ("the manual-round-trip detour:
+reviewing a plan is not the same as verifying its assumption") and a new
+bullet in the draft's "What was harder than expected" list. Resolved the
+corresponding open editorial question inline in the draft's closing
+notes.
+
+Fourth round: Mai answered the draft's other flagged editorial question —
+whether the Prompts section should pull more from the Phase 5 taxonomy
+revision rounds — confirming the story-arc curation approach and asking
+for more of those prompts specifically.
+
+**What I changed (round 4)**
+Added a "Phase 5 taxonomy revision rounds" subsection to `SUBMISSION_DRAFT.md`'s
+Section 3 (Prompts), pulling six more prompts from `PROMPT_LOG.md`'s Phase
+5 sessions in the same one-quote-per-pivot style as the rest of the
+section: the "do we truly have egg products" pushback that found ~50
+genuine shell-egg recalls inside an assumed-empty category; the "aligned
+and misaligned" plan review that caught a stage-1 question ballooning
+into stage-3 work; the no-API-key cost-consciousness check; the
+twelve-drift-point full-plan verification; the composition-not-destination
+correction across plant milk/protein powder/pet food/coffee creamer; and
+the closing five-cluster manual review round. Resolved the corresponding
+open editorial question inline in the draft's closing notes.
+
+**Open questions**
+None remaining from the draft's own flagged editorial calls — both are
+now resolved. Still open: Mai's final sign-off on the draft as a whole
+before anything moves to the actual Google Doc.
+
+**Time spent**
+~50 minutes across four rounds: reading/synthesizing the five source
+documents (delegated to a subagent for the first drafting pass),
+spot-checking claims against source, and four rounds of
+additions/restructuring prompted by Mai's mid-review feedback.
+
+---
