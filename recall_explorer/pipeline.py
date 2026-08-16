@@ -40,6 +40,13 @@ def load_recalls(path=None):
     df = pd.read_csv(path, dtype=str)
     validate_schema(df)
 
+    # Two rows in the 2026-08 snapshot carry a blank recall_number (event_ids
+    # 99068, 99205) -- an openFDA data gap, not something fetch_data.py can
+    # recover. recall_number is the product-level key the whole app keys off
+    # of, so these two are incomplete records, excluded rather than kept with
+    # a missing identity. See BUILD_LOG.md's Phase 5 Step 2 entry.
+    df = df[df["recall_number"].notna() & (df["recall_number"].str.strip() != "")].copy()
+
     df = parse_recall_dates(df)
     df = df[df["recall_date"].notna() & (df["year"] >= START_YEAR)].copy()
 

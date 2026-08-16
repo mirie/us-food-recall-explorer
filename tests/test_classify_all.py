@@ -246,12 +246,10 @@ def test_rows_to_classify_covers_the_full_real_dataset():
     """Every row in the real snapshot must be classifiable -- this pass is a
     full relabel, not a residual-only export like the old Phase 3 path.
 
-    Two rows share a blank recall_number (pre-existing in the raw openFDA
-    snapshot, not introduced by this module -- see BUILD_LOG's known-gap
-    note), so unique keys are one short of the row count. Both rows are
-    still present in `rows` and will still be sent to the classifier; the
-    gap only affects recall_number-keyed lookups downstream."""
+    load_recalls() already excludes the two known incomplete rows with a
+    blank recall_number (see pipeline.py and test_pipeline.py), so every
+    remaining row has a usable, unique key."""
     df = load_recalls()
     rows = rows_to_classify(df)
     assert len(rows) == len(df)
-    assert len({r for r, _ in rows}) == len(df) - 1
+    assert len({r for r, _ in rows}) == len(df)

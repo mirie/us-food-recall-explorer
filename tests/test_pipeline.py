@@ -15,8 +15,11 @@ import pytest
 from recall_explorer.pipeline import load_recalls
 from recall_explorer.transforms import count_by
 
-SNAPSHOT_ROWS = 29_161
-SNAPSHOT_EVENTS = 7_791
+# The raw 2026-08 snapshot holds 29,161 rows / 7,791 events. Two rows carry a
+# blank recall_number (an openFDA data gap, not a fetch_data.py bug) and are
+# excluded by load_recalls() as incomplete records -- see its comment.
+SNAPSHOT_ROWS = 29_159
+SNAPSHOT_EVENTS = 7_789
 
 
 @pytest.fixture(scope="module")
@@ -28,6 +31,13 @@ def df():
 
 def test_pipeline_returns_every_snapshot_row(df):
     assert len(df) == SNAPSHOT_ROWS
+
+
+def test_pipeline_excludes_rows_with_no_recall_number(df):
+    # The two known incomplete rows (event_ids 99068, 99205) must not appear.
+    assert df["recall_number"].notna().all()
+    assert (df["recall_number"].str.strip() != "").all()
+    assert set(df["event_id"]).isdisjoint({"99068", "99205"})
 
 
 def test_pipeline_adds_the_derived_columns(df):

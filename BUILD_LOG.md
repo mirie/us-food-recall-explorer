@@ -1350,3 +1350,57 @@ material, writing the 25 failing tests, implementing against them, fixing
 the two real-vs-assumed-shape breaks, full suite run.
 
 ---
+
+## Entry 18 — Resolve the blank-recall_number open question: exclude, don't patch
+
+**Goal**
+Close Entry 17's open question. Mai's call: treat the two blank-recall_number
+rows as incomplete data and exclude them from analysis/visualization
+entirely, not just work around them in the classifier.
+
+**What I built**
+`recall_explorer/pipeline.py`'s `load_recalls()`: added a filter dropping
+rows with a null or blank `recall_number` immediately after schema
+validation, before date parsing or category assignment. Comment documents
+the two known rows (event_ids 99068, 99205) and why -- `recall_number` is
+the product-level key the whole app keys off of, so a row without one is
+an incomplete record, not a normal edge case to route around.
+
+Since `classify_all.py` calls `load_recalls()` too, this automatically
+removes them from the classification input as well -- no special-casing
+needed in `classify_all.py` itself, which is exactly the "keep the code
+uniform" side of the (1)/(2) tradeoff Mai picked.
+
+**What worked**
+Both known rows turned out to be singleton events (each is its own
+`event_id`, shared with no other row), so excluding them also cleanly drops
+the event count by exactly 2 -- no partial-event weirdness to reason about.
+Re-ran the chunk math after the exclusion: still exactly 292 chunks, same
+[98, 97, 97] submission split, since 29,159 rows crosses the same 100-row
+chunk boundaries as 29,161 did.
+
+**What broke**
+Nothing broke; two existing tests needed their hardcoded expectations
+updated since they encode a structural fact of the snapshot that changed:
+`SNAPSHOT_ROWS` (29,161 -> 29,159) and `SNAPSHOT_EVENTS` (7,791 -> 7,789) in
+`test_pipeline.py`.
+
+**What I changed**
+- `pipeline.py`: the new filter (above).
+- `test_pipeline.py`: updated the two constants with a comment explaining
+  the 2-row gap; added `test_pipeline_excludes_rows_with_no_recall_number`
+  asserting both the general invariant (no blank/null recall_number
+  survives) and the specific two event_ids are gone.
+- `test_classify_all.py`: simplified
+  `test_rows_to_classify_covers_the_full_real_dataset` back to asserting
+  full uniqueness, since `load_recalls()` now guarantees it -- removed the
+  documented-collision special case from Entry 17.
+
+**Open questions**
+None. `.venv/bin/pytest` -> 160 passed (159 prior + 1 new), zero
+regressions.
+
+**Time spent**
+~15 minutes.
+
+---
