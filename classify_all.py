@@ -31,6 +31,20 @@ everything.
 `confidence` is written to the output CSV as a review artifact only; nothing
 downstream merges it into the app's runtime data (see the master plan's
 Step 4 -- build_classified_dataset.py does not carry it forward).
+
+Known failure mode (hit on the real 2026-08 run, not just a theoretical
+risk): a small fraction of 100-row chunks (16/292, ~5.5%) came back from
+the Batch API with `stop_reason == "end_turn"` -- not `max_tokens`, not a
+refusal -- but with fewer entries in the `classifications` array than input
+rows. The model silently dropped rows from its own structured output rather
+than truncating; the JSON schema enforces per-item shape, not array
+completeness. `cmd_fetch`'s completeness check catches this (it aborts
+loudly rather than writing a partial file, exactly as designed), but there
+is no automatic retry built into this script -- for the one-time 2026-08
+run, the 419 affected rows were manually re-submitted in smaller 25-row
+chunks (see BUILD_LOG.md's Step 3 entries), which resolved cleanly on the
+first attempt. If this script is ever re-run, budget for a manual
+retry-with-smaller-chunks pass on whatever `fetch` reports missing.
 """
 
 import argparse

@@ -626,3 +626,22 @@ processing (results retrievable from Anthropic for 29 days independent of
 any local process). Next step is `fetch` once all three batches end.
 
 ---
+
+## Session — Step 3: full run fetched, silent-row-drop bug found and fixed
+
+Mai's message: "looks like I ran out of API credits. I added more funds" --
+useful context surfaced mid-run; batches showed no errors before or after
+and completed normally.
+
+Wrote a background poll-and-fetch loop (`scratch/wait_and_fetch.sh`) so I
+wouldn't need to manually check status. All 3 batches ended cleanly, but
+`fetch`'s completeness guard caught 419 missing rows despite zero batch-
+level errors -- diagnosed as 16/292 chunks where the model silently
+omitted rows from its structured-output array despite a normal `end_turn`
+stop reason, distinct from the max_tokens truncation bug fixed earlier
+this session. Rather than patch around it, extracted the exact missing
+recall_numbers and re-submitted them in smaller 25-row chunks; all
+recovered cleanly on the first retry. Final file: 29,159/29,159 rows, 0
+missing, 0 unexpected. Uncategorized dropped from 12.2% to 0.8%.
+
+---

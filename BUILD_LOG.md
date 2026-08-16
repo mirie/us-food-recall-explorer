@@ -1513,3 +1513,75 @@ completeness check passes.
 ~5 minutes (submission + status check).
 
 ---
+
+## Entry 21 — Phase 5 Step 3: full run complete
+
+**Goal**
+Fetch and finalize results from the full 29,159-row classification run
+submitted in Entry 20.
+
+**What broke**
+All 3 batches ended cleanly (292/292 chunks succeeded, zero errored/
+canceled/expired at the batch-API level) -- but `classify_all.py fetch`'s
+completeness check refused to write the output file: 419 recall_numbers
+missing, 0 unexpected. Root cause, found by comparing each chunk's
+`classifications` array length against its input row count: 16 of 292
+chunks (~5.5%) had `stop_reason == "end_turn"` but the model had silently
+omitted rows from its own JSON output -- not a token-budget truncation (that
+would show `stop_reason == "max_tokens"`, the bug fixed in Entry 19), a
+different failure mode where structured-output schema validation guarantees
+per-item shape but not array completeness. Drop sizes ranged from 1 row (10
+chunks) to 99 rows (2 chunks, i.e. the model returned essentially one row
+and called it done).
+
+**What I changed**
+Did not silently patch or drop the missing rows. Extracted the exact 419
+missing `recall_number`s (`data/missing_rows_retry.json`, temporary, not
+checked in), and re-submitted them synchronously in smaller 25-row chunks
+(`scratch/retry_missing_rows.py`, not checked in) rather than the
+production 100-row size, on the theory that a smaller array is less likely
+to be dropped from. All 17 retry chunks returned complete
+(`25 in / 25 out` x16, `19 in / 19 out` x1) on the first attempt --
+confirms the drop rate scales with array size rather than being random
+per-row noise. Merged into the batch results and re-ran the completeness
+check: **0 missing, 0 unexpected against all 29,159 recall_numbers.**
+Documented the failure mode directly in `classify_all.py`'s module
+docstring for whoever re-runs this script next -- `cmd_fetch`'s abort-loudly
+behavior worked exactly as designed, but there's no automatic retry built
+in, so a manual smaller-chunk pass is the documented fallback.
+
+**Result**
+`data/recall_categories_llm_full.csv` written: 29,159 rows,
+recall_number/category/confidence. Category distribution:
+
+```
+Produce                         3890    Nuts/Seeds                  1300
+Dairy                           3633    Beverages                    971
+Prepared/Frozen                 3388    Plant Protein                782
+Bakery                          3317    Food Additives/Ingredients   231
+Supplements                     2733    Uncategorized                231
+Snacks/Candy                    2383    Baby/Toddler Food            201
+Spices/Condiments               2262    Baking Supplies              177
+Seafood                         1857    Beef/Pork/Poultry/Game Meats 152
+Grains/Cereal                   1374    Eggs                         142
+                                         Oils/Fats                    83
+                                         Non-Food Item                46
+                                         Pet Food/Treats               6
+```
+
+`Uncategorized` share: **0.8%** (231/29,159), down from the original
+keyword pass's 12.2% (3,554/29,161) -- confirms Q4's relabel-everything
+decision from the taxonomy-finalization pass. Confidence distribution:
+high 18,788 (64.4%), medium 8,718 (29.9%), low 1,653 (5.7%).
+
+**Open questions**
+Step 3b (six validation checks: self-consistency, agreement with the
+3,554 reviewed rows, confidence triage, category coherence, keyword-vs-LLM
+disagreement, residual inspection) not yet run -- next step per the master
+plan, pending Mai's go-ahead.
+
+**Time spent**
+~25 minutes: diagnosing the drop pattern, building and running the retry,
+verifying completeness, documenting the failure mode.
+
+---
