@@ -418,3 +418,531 @@ None deliberately left open this time — both design questions specific to thes
 ~20 minutes, entirely discussion and documentation.
 
 ---
+
+## Entry 4 — Phase 2 Slice 2: trend-over-time & top recalled foods
+
+**Goal**
+Close out Phase 2 by building the two remaining core charts — trend-over-time (line, severity split, dashed partial-2026 segment) and top recalled foods (horizontal bar, all 17 categories) — per `HANDOFF_PHASE2_SLICE2.md` and the two design decisions locked there.
+
+**What I built**
+- `top_foods_bar()` in `charts.py` — no new transform needed, `count_by()` already returns the right shape. Each lens panel sorts by its own counts (`sort="-x"`), per Mai's call in this session's design question.
+- `severity_trend()` in `transforms.py` — new pure transform, TDD'd first (11 tests against hand-built fixtures, following `seasonality_matrix()`'s rectangular-grid and `covered`-flag precedent): year x classification grid, zero-filled for missing combinations, a `partial` flag per year, and an unexpected-classification-value case so data drift surfaces instead of vanishing.
+- `severity_trend_lines()` in `charts.py` — three severity lines per panel via a fixed-order categorical color scale, with the dashed partial-2026 segment done as two layers rather than one `strokeDash` encoding (Vega-Lite groups a line per encoding value, so a single partial-year point in its own group draws nothing). Partial-year caption goes in the chart subtitle, worded from `df["recall_date"].max()` (2026-07-08), not the metadata publication date — per this session's other design question.
+- Wired both into `app.py`, replacing the two remaining `st.info()` placeholders; hoisted the `coverage_year, coverage_month` pair above the seasonality section since both charts now need it.
+- Loaded the `dataviz` skill before touching color: three severity lines use the validated categorical palette's slots 1-3 (blue/orange/aqua, pass CVD checks in both light and dark per `references/palette.md`), bars use slot 1 alone since category isn't a color dimension.
+
+**What worked**
+The transform numbers matched every figure in `HANDOFF_PHASE2_SLICE2.md`'s precomputed reference table exactly on the first real-data run (2016 event-lens severity split 415/358/40, 2026 85/134/17, overall Class II 14,616 / Class I 12,804 / Class III 1,741, top three categories Produce/Uncategorized/Bakery) — the handoff's upfront numbers paid for themselves as a verification step, not just documentation.
+
+**What broke**
+Two real bugs, both caught by self-checking the actual rendering before handing it off, not by the test suite (matching the testing contract's own claim that visual correctness isn't test-asserted):
+1. All 17 category bars rendered, but only every other y-axis label did — Vega-Lite's default label-overlap avoidance was silently dropping half of them at the chart's original fixed height, leaving unlabeled bars. Fixed with a height that scales with category count (`26px` per bar) plus `labelOverlap=False` on the axis.
+2. The dashed 2025→2026 segment left a visible gap instead of connecting to the solid line — an earlier version of the two-layer split excluded the connecting year (2025) from the solid layer entirely rather than letting it belong to both layers (endpoint of the solid segment *and* start of the dashed one). Also bumped the partial-year subtitle's color/size — the default was nearly illegible against the dark chart surface.
+
+**What I changed**
+See the two fixes above. Also learned mid-session that Streamlit's `runOnSave` defaults to `False` — a code edit doesn't trigger a rerun of an already-running instance without it, so the first re-screenshot after the bar-chart fix silently showed stale output until the server was restarted with `--server.runOnSave true`.
+
+**Open questions for Mai's manual review**
+Left `streamlit run app.py` running (`--server.runOnSave true`, port 8501) rather than closing the loop solo, per this session's plan: whether three lines per half-width trend panel reads clearly at a glance, and whether 17 category bars is workable in the top-foods chart or feels like too many (the no-"Other"-bucket call is reversible if so).
+
+**Time spent**
+~40 minutes: reading the handoff/PRD and confirming the pytest baseline, two AskUserQuestion rounds for the bar-order and partial-label placement decisions, TDD for `severity_trend()`, both charts, wiring, and the self-check/fix cycle that caught the two rendering bugs above.
+
+---
+
+## Entry 5 — Phase 3 Slice 1: Filters & Reactivity
+
+**Goal**
+Build the four PRD filters (year range, category, reason, severity) and wire them into the three existing charts, per `HANDOFF_PHASE3_SLICE1.md`. Key Insights stays out of scope — deliberately deferred to Slice 2 in the handoff.
+
+**What I built**
+- `apply_filters()` in a new `recall_explorer/filters.py` — one pure function, TDD'd first against hand-built fixtures (13 new tests in `tests/test_filters.py`): year range (inclusive `between`), category and severity (`isin`), and reason as OR-across-selected-tags with `"Other"` as its own selectable option matching untagged rows (`reason_tags == []`). `None` and `[]` both mean "no filter" on a dimension, so Streamlit's multiselect default (`[]` when nothing's picked) reads directly as "show all" with no special-casing in `app.py`.
+- `REASON_LABELS` added to `reasons.py`, derived from `REASON_RULES` rather than hand-copied, per the handoff's explicit instruction — it has to stay in sync if a rule is ever added.
+- `app.py` wiring: a `st.columns(4)` filter row (year slider, three multiselects) below the Key Insights placeholder and above the chart sections, matching the PRD's own layout order. `filtered_df = apply_filters(...)` computed once and threaded into all three chart sections in place of `df` — no changes to `seasonality_matrix`, `severity_trend`, or `count_by` themselves, confirming the handoff's prediction that they wouldn't need any. `coverage_year`/`coverage_month` and `last_recall_date` (the partial-year caption) stayed anchored to the full `df`, not the filtered subset, per the handoff.
+- Zero-state: one `if len(filtered_df) == 0` check wraps all three chart sections in an `else`, showing a single `st.info(...)` instead — the About expander stays outside the branch so it always renders.
+- Reworded the top-foods caption and `top_foods_bar()`'s docstring, both of which hardcoded facts about the *unfiltered* dataset ("All 17 categories", the Uncategorized #2→#4 rank-shift example) that go false under most filter states — confirmed with Mai via AskUserQuestion before touching it, since it wasn't explicitly in the handoff's scope.
+- `restrict_trend_to_severities(trend, severities)`, added to `filters.py` after Mai's manual QA caught a real bug (see below), TDD'd first (3 new tests). Applied to both `events_trend` and `products_trend` in `app.py`.
+
+**What worked**
+- Every test I wrote for the "harder" `apply_filters()` cases (reason OR-semantics, multi-tag rows, the Other toggle, combined-filter AND, zero-result) passed against the first-draft implementation without a second red-green cycle — the fixture design (five rows, each isolated by a different dimension) caught what it was meant to catch, so first-draft logic held up rather than the tests being too weak to notice a bug.
+- No `chromium-cli` and no Node/npx in this environment (checked directly), so first verified by driving the exact sequence of calls `app.py` makes — `apply_filters` → `seasonality_matrix`/`severity_trend`/`count_by` → the three chart builders — across six scenarios (full data, year range excluding 2026, single-category, multi-reason OR, Other-only, and a deliberately impossible combination) directly in Python. Confirmed the partial-year dashed segment disappears exactly when 2026 is filtered out (`partial_year_present=False`) with no special-casing needed, matching the handoff's prediction.
+- Mai asked whether the missing browser driver was fixable; `pip install playwright` resolved cleanly, so installed it plus `playwright install chromium` (~270MB into `.venv`, confirmed with Mai first) and drove the actual running app rather than only the underlying Python calls. Three real screenshots: default state (both seasonality panels populated, filter row present), Category=Dairy applied live (both heatmaps visibly re-rendered to a different, lower-magnitude pattern — proof of real reactivity, not a stale chart), and a deliberately impossible combination (Dairy + Botulism risk + Class III) showing the zero-state message with all three chart sections gone and the About expander still present below it. Zero console/page errors across all three. `playwright` is a verification-only dependency, not added to `requirements.txt` — the app itself never imports it.
+
+**What broke**
+`apply_filters()` and its wiring held up exactly as predicted — no code changes needed to `charts.py`, `partial` flag fell out correctly, no zero-layer edge case. But Mai's own manual QA against the live app (not from a screenshot I'd taken) caught a real bug my scripted checks missed: filtering the trend chart to Severity = Class I still showed Class II and Class III as flat lines pinned to zero instead of disappearing. Root cause was in `severity_trend()`, not in `apply_filters()` — `apply_filters` was already correctly narrowing `filtered_df` to Class I rows only. But `severity_trend()` always back-fills all three `SEVERITY_ORDER` classes as real zeros for every year, by design — `test_grid_is_rectangular_across_years_and_classifications` in `test_transforms.py` explicitly locks this in (it requires "Class III" to appear even in a fixture that never contains a single Class III row). That behavior is correct for the *unfiltered* view: a class with genuinely zero recalls in a year is a real zero worth showing, not a hole. But once the severity filter itself excludes a class, the class should vanish from the chart entirely — showing it as a flat zero line contradicts what the user just asked for.
+
+**What I changed**
+- The caption/docstring wording described above, confirmed with Mai first since the handoff didn't explicitly call it out as in-scope.
+- Fixed the severity-trend bug downstream of the transform rather than changing `severity_trend()` itself, since the transform's always-rectangular contract is correct and tested for the unfiltered case — this is filter-driven display logic, not a grid-completeness concern. Also used the bug report as the moment to double check Mai's other two questions from the same message: does Severity affect Top recalled foods, and does Reason? Both already did — screenshotted the top-foods chart with Severity = Class I applied and the bars visibly shrank to Class-I-only counts, because that chart reads from the same shared `filtered_df` as everything else. Only the trend chart's severity-line rendering was broken; the filtering itself was correct everywhere. Re-verified by actually driving the interaction in the browser (not the earlier scripted Python-level check) — selected Severity = Class I via the real dropdown, screenshotted the trend chart (confirmed Class II/III lines gone, only Class I plots) and the top-foods chart (confirmed bars shrank). Zero console/page errors both times.
+
+**Left running for Mai's live review**
+`streamlit run app.py` on port 8501, per this session's instruction — didn't close the loop solo.
+
+**Time spent**
+~20 minutes: reading the handoff/PRD/app.py/transforms/charts, one AskUserQuestion round on the stale caption, TDD for `filters.py` (16 tests total across both rounds), wiring `app.py`, the scripted six-scenario runtime check, browser-driven verification via a newly installed Playwright, and diagnosing + fixing the severity-trend bug Mai found through manual QA.
+
+---
+
+## Entry 5.5 — Handoff to Phase 3 Slice 2 (no code this entry)
+
+**Goal**
+Phase 3 Slice 1 was done and confirmed working (104 tests, live browser QA including the severity-trend fix), so prepare the handoff for Key Insights — the last piece of Phase 3.
+
+**What I built**
+No code. `HANDOFF_PHASE3_SLICE2.md` — precomputed reference numbers (event counts by year, peak year, top reason share) so the next session doesn't re-derive them from the CSV, plus one real architectural note and one real design decision surfaced before either got frozen in as a guess.
+
+**What worked**
+- The architectural note (Key Insights needs `filtered_df`, but the PRD places it visually *above* the Filters section that produces `filtered_df`) came from actually tracing Streamlit's execution model rather than assuming it would "just work" — a widget call both renders and returns its value at that call site, so the fix is an `st.container()` created early and written into later, not a restructure of the filter-then-compute flow Slice 1 already built. Worth writing down now rather than letting the next session discover it mid-build.
+- The four-card design question went to `AskUserQuestion` with two concrete previews built from real numbers (total events, % change, peak year, top reason vs. an alternative leaning on Class I severity share and top-category share) rather than left abstract — same lesson as every prior design question in this project. Settled: total events, % change from first to last full year *in the current view* (not a hardcoded baseline year, since that breaks under a year-range filter), peak year, and top reason tag's share of events. Rejected the severity/category-share alternative specifically because the trend and top-foods charts already show that same information in full underneath Key Insights — the reason-tag share doesn't duplicate anything else on the page.
+- One additional design note added without a separate question, since it followed directly from an existing PRD rule rather than needing a decision: `st.metric()`'s default colorized delta arrow (green-up/red-down) implies a good/bad value judgment that doesn't belong on a recall-count trend, so the handoff locks `delta_color="off"` on the % change card as a direct extension of the "never evaluative" rule, not a new one.
+
+**What broke**
+Nothing — planning-only entry.
+
+**Open questions carried into Slice 2**
+None deliberately left open. The zero-state behavior for Key Insights reuses Slice 1's existing `if len(filtered_df) == 0` branch rather than needing its own design pass.
+
+**Time spent**
+~10 minutes: confirming Slice 1's final state, computing real reference numbers (event-level reason-tag shares, corrected from an earlier product-level figure), one AskUserQuestion round, and writing the handoff.
+
+---
+
+## Entry 6 — Phase 3 Slice 2: Key Insights
+
+**Goal**
+Replace the Key Insights placeholder with four live `st.metric()` cards, per `HANDOFF_PHASE3_SLICE2.md`. Last piece of Phase 3.
+
+**What I built**
+- `key_insights(df, coverage_end)` in a new `recall_explorer/insights.py` — one pure function returning a `KeyInsights` namedtuple (total events, % change from first to last full year in view, peak year, top reason tag's share of events), TDD'd first against hand-built fixtures in `tests/test_insights.py` (14 tests). Full-year exclusion reuses the same `year*12+12 <= coverage_end_key` arithmetic as `severity_trend()`'s `partial` flag, computed inline rather than refactoring `transforms.py`.
+- Container-positioning fix in `app.py`: `key_insights_container = st.container()` created immediately before the Filters section, populated with the four `st.metric()` calls inside the existing `if len(filtered_df) == 0: / else:` branch further down — Streamlit renders a container where it's created, not where it's last written to, so Key Insights appears above Filters despite depending on `filtered_df`.
+- All four cards pass `delta_color="off"` — mandated by the handoff for the % change card specifically, extended to the peak-year and top-reason cards too since none of these numbers has a good/bad direction.
+- Zero-state reuses the existing branch: dash (`"—"`) placeholders instead of a second zero-state design.
+
+**What worked**
+- Every test passed on the first implementation attempt for total events, % change, and peak year — the plan's full-year-exclusion logic (borrowed directly from `severity_trend()`'s already-tested `partial` arithmetic) transferred cleanly.
+- Verified the unfiltered `key_insights()` output against the handoff's hand-computed reference numbers before wiring anything into `app.py`: total events, first/last full year and their counts, % change, and peak year all matched exactly on the first attempt.
+
+**What broke**
+Top reason's share did not match the handoff's reference number on the first attempt — got 3,088 events / 39.6% instead of the locked 3,066 / 39.4%. Root cause: my first implementation counted an event as tagged if *any* of its product rows carried the tag (`explode` across every row, matching how `apply_filters()` treats reason filtering at the row level). But 43 events in the real data have product rows whose `reason_tags` genuinely differ from each other — the same recall's per-product text drifts slightly, and the tagger picks up different keywords row to row. The handoff's locked reference numbers turned out to assume a different rule: one canonical row per event (the first), not a union across all of an event's rows. Confirmed by testing both approaches against the real snapshot — "first row per event" reproduced 3,066/39.4% (and the runner-up Salmonella 912, Listeria 903, Other 1,636/21.0%) exactly; the any-row-tagged approach didn't.
+
+**What I changed**
+- Switched `key_insights()`'s top-reason logic to `df.drop_duplicates("event_id", keep="first")` before exploding tags, treating `reason_for_recall` as a genuinely event-level attribute (duplicated onto product rows, not independently meaningful per product) rather than row-level. This only affects Key Insights' top-reason ranking — `apply_filters()`'s row-level reason filtering is untouched and intentionally different, since a user filtering by reason should still see any product row that happens to mention it.
+- Rewrote the affected tests in `test_insights.py` to encode this contract directly: one new test asserts that a second product row's drifted tag does NOT change an event's counted reason, with a fixture built to break a tie that would otherwise have made the bug invisible (the first fixture attempt for this test had both candidate reasons land on the same count by coincidence).
+
+**Open questions**
+None — all four handoff-locked reference numbers now match exactly, verified against the real snapshot before wiring into `app.py`.
+
+**Left running for Mai's live review**
+`streamlit run app.py`, per this session's instruction.
+
+**Note on process**
+Partway through this session Mai switched to remote control mode.
+
+**Time spent**
+~25 minutes: reading the handoff/PRD, TDD for `insights.py` (14 tests, one full red-green cycle plus a second cycle after the real-data discrepancy), diagnosing and fixing the top-reason methodology mismatch against the handoff's locked reference numbers, and wiring `app.py`.
+
+---
+
+## Entry 6.5 — Key Insights follow-up: sentence-format cards
+
+**Goal**
+Mai reviewed the Playwright screenshots from Entry 6 (hadn't opened the live app yet) and noted the cards read as bare data points, not sentences — the PRD's own Key Insights example (`"Recall events up 37% since 2014"`) is a full sentence, but neither the handoff nor Entry 6 had settled the card's internal format, so this was a real open question, not a mistake.
+
+**What I built**
+- Presented three concrete format options via `AskUserQuestion` (sentence as the `st.metric` value; the original label/number/delta split; sentence as a caption under a numeric card) with mocked previews built from the real numbers. Mai picked the sentence-as-metric-value option.
+- Rewrote all four card values as full sentences in `app.py` (e.g. `"Up 10.5% from 2012 to 2025"`, `"2016 was the peak year"`, `"Undeclared allergen, most common reason"`), keeping the short delta line under each. Pure presentation formatting on the already-tested `KeyInsights` fields — no changes to `insights.py` or its tests, consistent with the handoff's contract that the pure function owns the math and `app.py` only formats.
+
+**What broke**
+The sentences are longer than the numbers/short labels `st.metric` is designed for, and Streamlit truncates with an ellipsis by default. First CSS fix (targeting `[data-testid="stMetricValue"]` with `white-space: normal`) had no visible effect — inspected the DOM directly and found Streamlit's actual truncation rule (`white-space: nowrap; overflow: hidden; text-overflow: ellipsis`) lives on the nested `<p>` inside `stMarkdownContainer`, not the outer div. The outer div's computed style already showed `overflow: visible`, which is what made the first attempt look like it should have worked but didn't.
+
+**What I changed**
+Extended the CSS override to target the `<p>` and `stMarkdownContainer` explicitly, with `!important` to beat Streamlit's own stylesheet specificity. Re-verified with Playwright by reading `getComputedStyle` on the actual `<p>` element (not just the outer div) before trusting a screenshot again, then confirmed visually — all four cards now wrap onto 1-2 lines with no truncation.
+
+**Left running for Mai's live review**
+`streamlit run app.py`, still running (`--server.runOnSave true` picked up every change automatically, so no restart was needed for anything in this entry either).
+
+**Time spent**
+~15 minutes: one AskUserQuestion round with three built previews, the sentence rewrite, and two rounds of CSS debugging (the second only needed because the first fix targeted the wrong DOM element).
+
+---
+
+## Entry 6.6 — Key Insights follow-up: zero-state wording
+
+**Goal**
+Mai did her own manual QA (a genuine zero-result filter combo, not something scripted before) and found the zero-state cards showed a bare dash "—", which read as unclear/broken rather than intentional.
+
+**What I built**
+Went to `AskUserQuestion` to confirm scope, since there are two distinct "can't compute a value" states in the cards that Mai's message could have meant either or both of: zero rows (dashes) versus rows present but fewer than two full years, e.g. year range narrowed to 2026 alone ("N/A"). Confirmed: zero-rows case only — replaced the four dash placeholders in `app.py`'s `if len(filtered_df) == 0` branch with `"No conclusions"`. The separate "N/A" wording for the insufficient-full-years case is untouched; that's a real value gap on real data, not an empty view.
+
+**What worked**
+Verified live rather than trusting the change blind: drove the actual Category/Reason/Severity multiselects via Playwright (Dairy + Botulism risk + Class III — confirmed zero matches) and read the four `st.metric` values directly from the rendered page. All four now show "No conclusions"; the existing "No recalls match the current filters" info message and the three hidden chart sections were unaffected.
+
+**What broke**
+Nothing.
+
+**Left running for Mai's live review**
+`streamlit run app.py`, still running via `--server.runOnSave true`.
+
+**Time spent**
+~5 minutes: one AskUserQuestion round to disambiguate the two edge cases, the one-line wording change, and live Playwright verification against a real zero-result filter combo (the multiselect-driving script itself took a couple of selector attempts to get right).
+
+---
+
+## Entry 7 — Phase 3 complete; handoff to Phase 4 (no code this entry)
+
+**Goal**
+Phase 3 Slice 2 (Key Insights) plus both of Mai's live-review follow-ups were done and confirmed working, which closes out Phase 3 entirely — all three slices (core charts, filters & reactivity, Key Insights) now live behind 118 passing tests. Summarize the slice and hand off Phase 4 (transparency & UI polish), the only PRD phase left before Phase 5 (QA/docs/submission).
+
+**What I built**
+No code. `HANDOFF_PHASE4.md` — an audit of the PRD's four Phase 4 deliverables (last-updated timestamp, accessible labeling, explanatory notes, robust error UI) against what Phases 2-3 already built, rather than assuming Phase 4 starts from zero.
+
+**What worked**
+Reading `app.py`, `charts.py`, `schema.py`, and `pipeline.py` directly before writing anything found that three of the four deliverables are already substantially done: the last-updated caption exists, the chart palette is already validated and every widget/panel is labeled, and `load_recalls()` already raises a clear, tested `ValueError` on a bad snapshot. That left two concrete, low-ambiguity gaps instead of a vague "polish everything" scope: (1) the About section is missing the event-vs-product lens explanation the PRD's Design Direction section explicitly names as one of three things it must consolidate — currently that explanation only lives in scattered chart captions, not in the About section itself; and (2) `app.py` never catches `load_recalls()`'s `ValueError`, so a missing/corrupted CSV currently surfaces as Streamlit's raw traceback page instead of a friendly message, which is the concrete case the PRD's "disable or warn... if expected columns are missing" bullet maps to for this app.
+
+**What broke**
+Nothing — planning-only entry.
+
+**What I changed**
+Nothing in code. Also flagged one thing as a documented platform limitation rather than a build task: Vega-Lite charts via `st.altair_chart` have no built-in screen-reader data-table fallback, which isn't fixable in this stack in this timeframe — recommended one About-section line naming it, matching how the PRD already treats other data-source-boundary facts (meat-category absence, missing country of origin) as documented limitations rather than defects.
+
+**Open questions carried into Phase 4**
+None deliberately left open — both concrete gaps are small enough (a markdown bullet, a try/except) that no design decision needs Mai's input before starting.
+
+**Time spent**
+~10 minutes: confirming Phase 3's final state (118 tests, both live-review fixes), reading four source files to audit Phase 4's four deliverables against real code rather than the PRD's abstract list, and writing the handoff.
+
+---
+
+## Entry 8 — Phase 4: About-section gaps + robust error UI
+
+**Goal**
+Execute the short, targeted slice `HANDOFF_PHASE4.md` scoped: close the two
+remaining About-section gaps and catch `load_recalls()`'s `ValueError` in
+`app.py` instead of letting it surface as a raw traceback.
+
+**What I built**
+Two new bullets in `app.py`'s "About the data & limitations" expander — one
+explaining the event-vs-product lens split (reusing the 3.74x
+product-to-event ratio already established in the PRD), one documenting the
+Vega-Lite/Altair screen-reader-fallback gap as a platform constraint, in the
+same tone as the six existing bullets. Also wrapped the `get_data()` call
+site in `try/except ValueError`, showing `st.error(str(e))` then
+`st.stop()`.
+
+**What worked**
+No new pure functions were needed, as the handoff predicted — both were
+markdown-string and control-flow changes in `app.py` only. Verified the
+error path by renaming `data/food_recalls.csv` out of the way, restarting
+the Streamlit process, and confirming the server log showed no unhandled
+traceback (previously `load_recalls()`'s `ValueError` would have propagated
+unhandled); confirmed directly in Python that `load_recalls()` still raises
+`ValueError` with its existing actionable message. Restored the CSV,
+restarted, confirmed HTTP 200 with a clean log.
+
+**What broke**
+Nothing.
+
+**What I changed**
+Nothing beyond the plan — no design decisions needed re-opening.
+
+**Left running for Mai's live review**
+`streamlit run app.py --server.runOnSave true`, running on port 8501.
+
+**Time spent**
+~10 minutes: reading the handoff and PRD sections it referenced, three small
+edits, and the rename/restart verification cycle for the error path.
+
+---
+
+## Entry 9 — Phase 4 remote review: screenshots in place of live access
+
+**Goal**
+Mai asked to review Phase 4 live but was away from her laptop, so live
+review wasn't possible. Needed a substitute that showed the actual running
+app (not a description of it), including two specific edge cases she asked
+about after seeing the first round: the zero-result state and the
+insufficient-data state.
+
+**What I built**
+A Playwright driver script against the already-running `streamlit run app.py`
+session, capturing: the default view, the About expander scrolled to the two
+new Phase 4 bullets, the Category filter's type-ahead dropdown, a
+Produce-filtered result, a genuine zero-result combination (Dairy + Botulism
+risk + Class III), and a single-year selection (2026 only) to trigger the
+insufficient-full-years "N/A" cards. First delivered via `SendUserFile`;
+when Mai reported she couldn't access those, rebuilt the same six
+screenshots as a self-contained HTML gallery (base64-embedded images, no
+external requests) and published it as a Claude Artifact instead, which
+worked.
+
+**What worked**
+Driving Streamlit's newer react-aria-based combobox widgets (not the
+BaseWeb selects assumed from memory) — `get_by_role("combobox", name=...)`
+plus typing the option text to filter, rather than clicking through an
+unfiltered option list. Confirmed via direct DOM inspection when the first
+locator guesses (`data-baseweb='select'`) came back empty.
+
+**What broke**
+Two things, both interaction-model mistakes rather than app bugs. First,
+pressing `Escape` after clicking a dropdown option cleared the just-made
+selection instead of confirming it — clicking elsewhere on the page instead
+of `Escape` was what actually committed the tag. Caught by checking the
+rendered event count after the "filtered" screenshot still showed the
+full unfiltered total. Second, `SendUserFile` reported success but Mai
+couldn't open the files on her end — no error surfaced on this side, so the
+gap was invisible until she said so directly.
+
+**What I changed**
+Switched the delivery mechanism from `SendUserFile` to a published Artifact
+(a single HTML file with all six PNGs inlined as data URIs) once the first
+approach was confirmed not to reach her. Left the actual running Streamlit
+session untouched throughout — all screenshot capture used separate headless
+browser instances against the same port, so the live app Mai will eventually
+review directly was never restarted or reconfigured for this.
+
+**Time spent**
+~20 minutes: the driver script and two rounds of selector debugging, the
+`Escape`-vs-click-away bug hunt, and rebuilding the delivery as an Artifact
+after the first channel failed.
+
+---
+
+## Entry 10 — Phase 5 kickoff: LLM category-labelling build (manual round trip)
+
+**Goal**
+`HANDOFF_PHASE5.md` scoped this session as QA + edge cases + a submission
+draft, explicitly deferring the LLM-assisted category-labelling pass (PRD
+"Phase 3 (added)") out of scope. Mai wanted that pass pulled in first, since
+refining the ~12% `Uncategorized` residual could shift chart shapes the QA
+pass and the doc should reflect.
+
+**What I built**
+The PRD's Phase-3-added spec assumed a standalone script hitting the
+Anthropic API directly, batching product descriptions against a fixed
+category enum. Mai was on mobile via Remote Control with no terminal access,
+so there was no safe way to hand a script an API key this session. Landed on
+a manual round trip instead: `recall_explorer/llm_categories.py` (new, pure,
+no network) exports the 3,554 still-`Uncategorized` rows as
+`(recall_number, product_description)`, builds a ready-to-paste prompt
+stating the fixed category enum and the exact expected output shape, and
+parses/validates whatever comes back from a *separate* Claude.ai chat Mai
+runs herself. `recall_explorer/pipeline.py` gained
+`apply_llm_category_override()`, a pure function that prefers an optional
+`llm_category` raw column over the keyword-derived `category` wherever it's
+set, wired into `load_recalls()` right after the keyword pass. The frozen
+`categories.py` rules are untouched either way — this only layers on top.
+
+Sent Mai the export CSV and the prompt text via `SendUserFile`; she'll take
+those to a separate Claude.ai chat (possibly iterating a few times to tune
+the category calls) and paste the result back for the merge step.
+
+**What worked**
+`CATEGORY_ENUM` is built directly from `categories.py`'s own
+`PRODUCT_IDENTITY` and `CATEGORY_RULES` names rather than a hand-copied
+list, so it can't silently drift out of sync if a category is ever
+added/renamed there. `EXPECTED_COLUMNS` in `schema.py` turned out to already
+be an allow-list check (`missing = [c for c in EXPECTED_COLUMNS if c not in
+df.columns]`), so adding the optional `llm_category` column later won't need
+a schema change.
+
+**What broke**
+Testing `apply_llm_category_override()` through `load_recalls()` directly
+wasn't viable — `validate_schema()` enforces a 29,000-row floor a small
+fixture CSV can't meet. Extracted the override into its own pure function
+and tested it directly on hand-built DataFrames instead, matching this
+project's established three-tier strategy (strict TDD on pure logic, one
+real-file pipeline test, a schema guardrail).
+
+**What I changed**
+Nothing outside the new module and the one pipeline addition — no chart or
+insights code needed changes, since `count_by`/`seasonality_matrix`/etc. all
+key off whatever the `category` column holds.
+
+**Open questions**
+Whether the fixed-enum prompt holds up across Mai's iteration runs on the
+other chat, and whether the merge step (once she pastes results back) turns
+up any `parse_classification_result` problems worth reviewing before
+trusting the merge.
+
+**Time spent**
+~25 minutes: reading the handoff/PRD, three rounds of `AskUserQuestion` to
+land on the manual-round-trip design given the mobile/no-terminal
+constraint, TDD on `llm_categories.py` and the pipeline override (16 new
+tests, all green), and generating/sending the export.
+
+---
+
+## Entry 10.5 — Export delivery, round two: the file-link problem again (no code this entry)
+
+**Goal**
+Get the 3,554-row CSV and the classification prompt actually into Mai's
+hands on mobile, after `SendUserFile` reported success but the file link
+wasn't clickable/downloadable from her side — the same class of delivery
+gap as Phase 4's Entry 9, this time on the input side rather than the
+output side.
+
+**What I built**
+A single self-contained HTML page (published as a Claude Artifact, not sent
+as a file) embedding both the CSV text and the prompt text directly in
+read-only `<textarea>` elements, each with a "Copy" button
+(`navigator.clipboard.writeText`, falling back to select-all if clipboard
+access is blocked) plus a best-effort blob-URL download link as a third
+option. Same light/dark token structure as the Phase 4 screenshot gallery.
+
+**What worked**
+The copy-to-clipboard buttons — Mai confirmed she was able to get both the
+CSV and the prompt into the other Claude.ai chat this way and has kicked
+off classification there.
+
+**What broke**
+Two delivery attempts before landing on one that worked: `SendUserFile`
+first (file card visible but not clickable/downloadable on her mobile
+client), then the Artifact's own download-button/blob-URL path (didn't
+trigger a download on her device either — likely an iOS Safari restriction
+on programmatic downloads from a blob URL outside a direct user gesture
+chain). The copy-to-clipboard buttons, which don't rely on the browser's
+download UI at all, were what actually worked.
+
+**What I changed**
+Nothing in the app or its tests — this was entirely about getting existing
+export artifacts (the CSV, the prompt) into Mai's hands, not about their
+content.
+
+**Open questions**
+Same as Entry 10: whether the fixed-enum prompt holds up across her
+iteration runs, and what `parse_classification_result` turns up once she
+pastes results back — that merge step hasn't happened yet.
+
+**Time spent**
+~10 minutes: two failed delivery attempts, the Artifact rebuild with copy
+buttons, and confirmation it worked.
+
+---
+
+## Entry 11 — The subset pass covered 12%, not 100%: a scope error and its correction (planning only, no code)
+
+**Goal**
+Confirm the file to merge (per `HANDOFF_PHASE5_LLM_MERGE.md`), run the merge,
+and continue into QA — the plan Phase 5 was supposed to execute this session.
+
+**What happened instead**
+`export_for_classification()` filters to `category == "Uncategorized"`
+([llm_categories.py:44](recall_explorer/llm_categories.py#L44)). The manual
+Claude.ai round trip from Entries 10–10.5 therefore classified 3,554 rows —
+12.2% of the dataset — not the full 29,161 rows Mai intended. It filled the
+keyword rules' blanks; it never reviewed a single one of the 25,607 rows the
+keyword rules had already labeled.
+
+Confirmed from both directions independently:
+
+- Here: a fresh `export_for_classification(load_recalls())` reproduces
+  exactly the 3,554-row expected set; the classification CSV's recall
+  numbers match it 1:1, zero outside it.
+- From the classifying session, asked directly: it confirmed the same
+  boundary and named the tell it had itself produced but misread — its own
+  QA found *zero* egg products, *zero* oils/fats, and one poultry row in its
+  slice, which it reported as a property of the dataset rather than the
+  fingerprint of a pre-filtered file. (Keyword rules catch "chicken",
+  "egg", and "olive oil" trivially, so those rows never reached it.)
+
+Caught before any merge ran, so nothing needed to be undone — but the
+original merge plan (`HANDOFF_PHASE5_LLM_MERGE.md`) was built on the
+assumption that this file was the intended full-dataset result, and that
+assumption was wrong.
+
+**What I verified before replanning**
+
+- **The app is not brittle to this kind of data change.** Grepped
+  `app.py`, `charts.py`, `insights.py`, `filters.py`, `transforms.py` for
+  hardcoded category names: one hit, a comment in the About-section prose.
+  A dry-run merge of the 3,554-row file (never committed) broke exactly two
+  tests, both documentation-shaped — the `Uncategorized`-share bound and an
+  exact-column-order schema assertion.
+- **Real errors exist in the unaudited 87.8%.** `Beef` (65 rows) and `Pork`
+  (88 rows) are mostly flavoring words ("Nat Flv Beef FF", "Bacon Twice
+  Bake"), matching `categories.py`'s own documented tier-3 tradeoff.
+  `Poultry/Eggs` (208 rows) is two categories under one label: roughly 50
+  genuine shell-egg recalls — including the Rose Acre Farms salmonella and
+  Almark Foods listeria events, two of the largest in the 2012–2026 window
+  — mixed with ~141 poultry-flavoring rows.
+
+**Decision: reclassify the full dataset via the API, not another manual
+round trip.** The original manual-round-trip design (Entry 10) existed
+solely because Mai was on mobile Remote Control with no terminal access.
+That constraint no longer holds — she now has terminal access and ran
+`ant auth login` herself mid-session, giving the project a working OAuth
+profile (`user:inference` scope, no static key needed). The PRD's original
+"one-time API script" design is viable again, and correct at this volume:
+29,161 descriptions cannot go through a chat round trip without repeating
+the three-attempt delivery saga from Entry 10.5 roughly eight times over.
+
+**Decisive input: a recovered decision log.** Mid-session, Mai retrieved a
+full decision log from the classifying session — an 18-label taxonomy, a
+governing principle ("classify what the product most fundamentally *is*,
+not every ingredient it contains"), per-category inclusion rules, 10
+boundary rules for the collisions that actually caused trouble (Bakery vs.
+Baking Supplies, cooked beans, frozen novelties, chile products, bulk
+batter mixes, ...), and a **self-flagged "Known gaps" section**. That
+section named the same three blind spots independently found here — zero
+eggs, zero oils, one poultry row — and asked, unprompted, for a ruling on
+each. This is now the taxonomy spec; the new plan finalizes it rather than
+designing one from scratch.
+
+Pressure-testing the log against the full dataset (not just its own
+awareness of its gaps) found it is not fully comprehensive either: ~640
+rows of alcohol (262), coffee creamer (237), broth/stock (82), and baby
+food (62) have no rule at all, plus honey and agave/stevia/molasses that
+are only implied. The new plan's Step 1 closes these alongside the log's
+own four open questions before the classification prompt is written.
+
+**What I changed**
+Wrote a full replacement plan (`.claude/plans/read-handoff-phase5-llm-merge-md-first-t-purrfect-lynx.md`),
+superseding both `HANDOFF_PHASE5_LLM_MERGE.md`'s merge-the-subset design and
+this session's own first two drafts of the replacement. Key decisions locked
+into the plan:
+
+- Taxonomy: the recovered log's 18 labels plus a new `Eggs` label (the log's
+  own top-priority open question), finalized against a ~5,000-row stratified
+  design sample that includes *all* 466 rows from the five categories the
+  log never saw evidence for (`Poultry/Eggs`, `Pork`, `Beef`, `Plant
+  Protein`, `Oils/Fats`) rather than sampling into them.
+- Classification: `claude-opus-5` via the Message Batches API (50% off),
+  structured outputs with a `category` enum (invalid labels impossible by
+  construction) plus a `confidence` field, `effort: "high"` — Opus 5's
+  default — with the pilot sweeping *downward* only if cheaper settings
+  produce materially the same labels.
+- Pipeline: replace `apply_llm_category_override()` with a direct read of
+  `llm_category` and drop `assign_category` from the runtime path entirely,
+  rather than keeping it as a fallback — a keyword fallback for
+  never-seen rows would silently reintroduce the labeling this pass exists
+  to replace. `categories.py` and its 31 tests stay in the repo, frozen, as
+  provenance for the submission doc.
+- Trust: six validation checks (self-consistency, agreement with the 3,554
+  reviewed labels, confidence triage, category-coherence sampling,
+  keyword-vs-LLM disagreement per category, residual inspection) rather than
+  spot-checking, because 29,161 rows cannot be eyeballed and the point is to
+  make the remaining uncertainty locatable.
+
+**Open questions**
+Actual cost, once the pilot measures real token usage including thinking
+(the earlier ~$9 `chars/4` estimate excludes thinking tokens and is a
+floor, not a number to plan against). Whether the coverage-hole categories
+(alcohol, coffee creamer, broth, baby food) need genuinely new labels or
+fit inside the existing 18 with the right rule. Whether `effort: "high"`
+turns out to be necessary once the pilot's downward sweep runs, or whether
+`medium` gives the same labels for less.
+
+**Time spent**
+~2 hours: confirming the scope error from both sides, verifying app
+robustness and the meat/eggs data problems empirically, three full
+plan-writing passes (the first assumed no API access and proposed a
+500-row hand-design; the second incorporated Mai's terminal access and the
+Batch API; the third incorporated the recovered decision log and cut the
+plan's accumulated self-justifying prose after a request to reduce drift
+risk), and ten rounds of user review comments, each requiring a factual
+check before the fix (confirming `ant auth status`, sizing the untested
+categories at 466 rows, verifying all 249 "Blue Bell" rows are ice cream,
+pressure-testing the log's coverage against the real data, reconciling an
+internally contradictory `effort` recommendation).
+
+---
