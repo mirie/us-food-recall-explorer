@@ -71,7 +71,11 @@ When nothing in the description reliably indicates a category, use
 ## 3. Category rules
 
 **Dairy** — Milk, cheese of all kinds, cream, butter, yogurt, ice cream,
-sherbet, gelato, frozen custard, half-and-half, paneer, quark, mascarpone.
+sherbet (dairy-based), gelato, frozen custard, half-and-half, paneer,
+quark, mascarpone. **Sorbet is not sherbet** — sorbet is water-, fruit-,
+and sugar-based with no dairy, and belongs with the water-based frozen
+novelties in `Prepared/Frozen` (see the frozen-novelties boundary rule),
+even from an otherwise dairy-focused creamery brand.
 Flavored milk (chocolate, strawberry) is `Dairy`, not `Beverages` or
 `Snacks/Candy`. Egg nog is `Dairy` — it is an overwhelmingly milk-and-cream
 dairy-plant product; the word "egg" in the name is not the product. Cheese-
@@ -247,8 +251,11 @@ baby food; infant cereal; teething and toddler snacks explicitly marketed
 for infants/toddlers; **and all infant and toddler formula, regardless of
 protein base** (milk-based, soy-based, amino-acid-based, goat-milk-based —
 formula is one product family and stays together rather than fragmenting
-by protein source). Adult medical/enteral nutrition is not baby food →
-`Supplements`. A cracker or puff sold to the general market is
+by protein source). **Donor and mothers'-own human breast milk** (raw,
+pasteurized, frozen, or as a fortifier/caloric-additive product) — it is
+an infant feeding product, not commercial dairy, regardless of the word
+"milk" in the description. Adult medical/enteral nutrition is not baby
+food → `Supplements`. A cracker or puff sold to the general market is
 `Snacks/Candy` even if toddlers eat it — the label must be
 infant/toddler-directed.
 
@@ -275,7 +282,8 @@ products" entries; anything genuinely ambiguous.
 | **Protein vs. Prepared/Frozen** | If a single named protein dominates, use the protein category (beer-battered cod → `Seafood`). If it's a composite meal or sandwich, use `Prepared/Frozen` (Italian sub → `Prepared/Frozen`). |
 | **Cooked beans** | Cooked bean dishes are `Plant Protein`, not `Prepared/Frozen`. This overrides the composite-meal rule. |
 | **Supplements vs. Food Additives** | Consumer dosage forms are Supplements. The same substance in 25–50 kg drums for manufacturing is Food Additives (bulk pepsin, bulk magnesium citrate). |
-| **Frozen novelties** | Dairy-based (ice cream, sherbet, gelato) → `Dairy`. Water-based (Italian ice, popsicles, bolis) and non-dairy frozen desserts → `Prepared/Frozen`. |
+| **Frozen novelties** | Dairy-based (ice cream, sherbet, gelato) → `Dairy`. Water-based (Italian ice, popsicles, bolis, **sorbet/sorbetto**) and non-dairy frozen desserts → `Prepared/Frozen`. |
+| **Bare deli trays/platters** | A generic "TRAY"/"PLATTER" description with no other food-identifying text follows a named cut or style when one is present (carving tray, charcuterie tray, meat loaf platter → `Beef/Pork/Poultry/Game Meats`). Genuinely unnamed contents (a bare "cocktail tray" or "catering tray" with no named filling) → `Uncategorized`, not a guess. |
 | **Snack mixes** | Nut- or dried-fruit-based → `Nuts/Seeds`. Chip-, cracker-, or corn-based → `Snacks/Candy`. |
 | **Chile products** | Fresh whole peppers → `Produce`. Powders, pastes, roasted/diced processed chile, and chile kits → `Spices/Condiments`. |
 | **Batter mixes** | Bulk industrial batter/predust/breader → `Grains/Cereal`, not `Uncategorized`. |
@@ -371,3 +379,15 @@ dosage form from a supplement brand follows the dosage form →
   placement; coffee creamer is a two-way split (dairy → `Dairy`,
   everything else including plant-based → `Beverages`), not three-way.
   Label count unchanged at 21.
+- **v3** (Mai's review of Step 3b's residual/self-consistency findings,
+  2026-08-16): closed two gaps the full-dataset pass exposed. Donor/
+  mothers'-own human breast milk added explicitly to `Baby/Toddler Food`
+  (had been split across `Dairy`, `Uncategorized`, and `Baby/Toddler Food`
+  inconsistently — it is an infant feeding product, not commercial dairy).
+  Sorbet clarified as water-based, not dairy-based, and routed to
+  `Prepared/Frozen` with the other water-based frozen novelties (had split
+  ~90/10 between `Prepared/Frozen` and `Dairy`). Also added a boundary rule
+  for bare deli tray/platter descriptions (named cut/style → the meat
+  label; genuinely unnamed contents → `Uncategorized`). Label count
+  unchanged at 21; 27 rows in `recall_categories_llm_full.csv` corrected
+  directly rather than re-running the full batch.

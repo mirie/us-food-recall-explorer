@@ -58,11 +58,11 @@
     "taxonomy_doc": "CLASSIFICATION_RULES.md",
     "taxonomy_label_count": 21,
     "uncategorized_share_before": "12.2% (3554/29161, keyword pass)",
-    "uncategorized_share_after": "0.75% (218/29159, post Step 3b fix)",
+    "uncategorized_share_after": "0.73% (213/29159, post Step 3b + Mai's manual review fixes)",
     "confidence_distribution": {
-      "high": "64.5% (18801/29159)",
-      "medium": "29.9% (8715/29159)",
-      "low": "5.6% (1643/29159)"
+      "high": "64.6% (18827/29159)",
+      "medium": "29.8% (8701/29159)",
+      "low": "5.6% (1631/29159)"
     },
     "step_3b_validation": {
       "1_self_consistency": {
@@ -92,6 +92,13 @@
         "finding": "Overwhelmingly bare SKUs/item codes, gift baskets and assortments, and unlabeled bulk shipments -- matches the taxonomy's own Uncategorized definition. Found one systematic miss: 13 rows matching the exact 'BATTER MIX X1, 50 LBS'-style bare-code pattern the Grains/Cereal rule's worked example explicitly covers. Patched directly to Grains/Cereal (confidence: high) in data/recall_categories_llm_full.csv. Residual after fix: 218 rows (0.75%)."
       },
       "verdict": "All six checks pass. No systemic issues beyond the one fixed (13 rows). Step 4 (pipeline refactor) is cleared to proceed."
+    },
+    "manual_review_corrections": {
+      "description": "Mai's review of the Step 3b findings surfaced two real CLASSIFICATION_RULES.md gaps and one bare-description boundary pattern, corrected directly in recall_categories_llm_full.csv (v3 revision, see CLASSIFICATION_RULES.md's Revision history).",
+      "human_breast_milk": "14 rows (donor/mothers'-own human milk, previously split across Dairy/Uncategorized/Baby-Toddler-Food) -> Baby/Toddler Food.",
+      "sorbet": "9 rows (previously split ~90/10 Prepared/Frozen vs Dairy) -> Prepared/Frozen, clarifying sorbet is water-based, not dairy-based like sherbet.",
+      "bare_deli_trays": "4 of 6 flagged Albertson's bare tray/platter codes (named cut/style: carving, charcuterie, Italian sampler, loaf) -> Beef/Pork/Poultry/Game Meats. 2 with no named filling (catering tray, cocktail tray) left Uncategorized.",
+      "uncategorized_share_after": "0.73% (213/29159)"
     }
   }
 }

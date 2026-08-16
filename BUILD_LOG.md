@@ -1668,3 +1668,56 @@ checks' worth of comparison scripts and manual review, the batter-mix
 patch, documentation.
 
 ---
+
+## Entry 23 — Phase 5 Step 3b: Mai's manual review of the boundary cases
+
+**Goal**
+Surface the genuinely judgment-call rows the six checks turned up (not
+pipeline bugs -- real ambiguity a human should decide) and apply Mai's
+calls.
+
+**What I found and Mai decided**
+- **Donor/mothers'-own human breast milk** (22 rows matching "human milk/
+  breast milk/donor milk"): inconsistently split across `Dairy` (13),
+  `Baby/Toddler Food` (6, correct), `Uncategorized` (1), and one unrelated
+  supplement (turmeric marketed to boost milk supply, correctly excluded).
+  Mai: all human milk -> `Baby/Toddler Food` -- it's an infant feeding
+  product, not commercial dairy, regardless of the word "milk."
+- **Sorbet** (139 rows): split ~90/10 between `Prepared/Frozen` and
+  `Dairy`. Mai: sorbet belongs with the water-based frozen novelties
+  (Italian ice, popsicles) -> `Prepared/Frozen`, same call the doc already
+  made for those. `CLASSIFICATION_RULES.md` had listed "sherbet" under
+  Dairy without distinguishing it from sorbet (sherbet has dairy; sorbet
+  doesn't) -- a real doc gap, not a model error.
+- **"Gravy Beef" (F-0812-2020)** and **"3FT American Substitute Turkey...
+  deli service item" (F-0995-2016)**: both already landed correctly
+  (`Spices/Condiments` and `Beef/Pork/Poultry/Game Meats` respectively) --
+  flagged for review, no change needed.
+- **Bare Albertson's deli tray/platter codes** (6 rows, e.g. "PLATTER LOAF
+  SLC 20CT," "TRAY CHARCUTERIE ELEGANT," all `Uncategorized`): Mai read
+  the named-cut ones as deli meat. Applied to the 4 with a named cut/style
+  (carving, charcuterie, Italian sampler, loaf) -> `Beef/Pork/Poultry/Game
+  Meats`. Left 2 with no named filling ("catering tray," "cocktail tray")
+  `Uncategorized` -- genuinely unnamed contents, not a guess.
+
+**What I changed**
+27 rows patched directly in `data/recall_categories_llm_full.csv`
+(confidence set to `high` -- human-confirmed, no longer a model guess): 14
+human milk, 9 sorbet, 4 deli trays. `Uncategorized` share: 218 -> **213
+(0.73%)**.
+
+`CLASSIFICATION_RULES.md` updated (v3 in Revision history) to close the
+two real gaps for any future re-run: `Baby/Toddler Food` rule now names
+human/donor breast milk explicitly; `Dairy`'s sherbet/gelato line now
+distinguishes sorbet as water-based and points to `Prepared/Frozen`; a
+new boundary-rule row covers bare deli tray/platter descriptions (named
+cut/style -> the meat label, unnamed contents -> `Uncategorized`).
+`fetch_metadata.json`'s `llm_classification_pass` block updated with the
+corrected confidence distribution and a new `manual_review_corrections`
+sub-block.
+
+**Time spent**
+~15 minutes: pulling every row matching each pattern, applying Mai's
+calls, updating the rules doc and metadata.
+
+---

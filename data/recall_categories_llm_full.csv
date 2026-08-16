@@ -188,7 +188,7 @@ F-0015-2024,Prepared/Frozen,high
 F-0015-2025,Bakery,high
 F-0016-2013,Produce,high
 F-0016-2014,Dairy,high
-F-0016-2015,Dairy,medium
+F-0016-2015,Baby/Toddler Food,high
 F-0016-2016,Produce,medium
 F-0016-2017,Bakery,high
 F-0016-2018,Snacks/Candy,high
@@ -200,7 +200,7 @@ F-0016-2024,Prepared/Frozen,high
 F-0016-2025,Bakery,high
 F-0017-2013,Produce,high
 F-0017-2014,Dairy,high
-F-0017-2015,Dairy,low
+F-0017-2015,Baby/Toddler Food,high
 F-0017-2016,Produce,medium
 F-0017-2017,Bakery,high
 F-0017-2018,Produce,high
@@ -3798,7 +3798,7 @@ F-0319-2017,Nuts/Seeds,medium
 F-0319-2018,Snacks/Candy,high
 F-0319-2020,Produce,medium
 F-0319-2021,Spices/Condiments,high
-F-0319-2022,Dairy,low
+F-0319-2022,Baby/Toddler Food,high
 F-0319-2023,Produce,high
 F-0319-2024,Produce,high
 F-0319-2025,Bakery,high
@@ -4118,7 +4118,7 @@ F-0344-2017,Supplements,medium
 F-0344-2018,Snacks/Candy,medium
 F-0344-2019,Prepared/Frozen,high
 F-0344-2020,Produce,medium
-F-0344-2021,Dairy,medium
+F-0344-2021,Baby/Toddler Food,high
 F-0344-2022,Bakery,high
 F-0344-2023,Nuts/Seeds,high
 F-0344-2024,Produce,high
@@ -5609,7 +5609,7 @@ F-0460-2017,Bakery,high
 F-0460-2018,Plant Protein,high
 F-0460-2019,Dairy,high
 F-0460-2020,Seafood,high
-F-0460-2021,Dairy,low
+F-0460-2021,Baby/Toddler Food,high
 F-0460-2022,Supplements,high
 F-0460-2023,Prepared/Frozen,high
 F-0460-2024,Spices/Condiments,low
@@ -5707,7 +5707,7 @@ F-0467-2025,Bakery,medium
 F-0468-201,Produce,medium
 F-0468-2013,Nuts/Seeds,medium
 F-0468-2015,Snacks/Candy,low
-F-0468-2016,Dairy,medium
+F-0468-2016,Baby/Toddler Food,high
 F-0468-2017,Bakery,high
 F-0468-2018,Plant Protein,high
 F-0468-2019,Dairy,high
@@ -9606,7 +9606,7 @@ F-0773-2016,Nuts/Seeds,high
 F-0773-2017,Bakery,medium
 F-0773-2018,Prepared/Frozen,medium
 F-0773-2019,Beverages,high
-F-0773-2020,Dairy,low
+F-0773-2020,Baby/Toddler Food,high
 F-0773-2021,Produce,medium
 F-0773-2022,Produce,medium
 F-0773-2023,Snacks/Candy,medium
@@ -14384,7 +14384,7 @@ F-1177-2023,Spices/Condiments,medium
 F-1177-2024,Prepared/Frozen,high
 F-1178-2013,Bakery,high
 F-1178-2014,Beef/Pork/Poultry/Game Meats,medium
-F-1178-2015,Dairy,medium
+F-1178-2015,Prepared/Frozen,high
 F-1178-2016,Supplements,medium
 F-1178-2017,Prepared/Frozen,medium
 F-1178-2018,Supplements,high
@@ -17903,7 +17903,7 @@ F-1503-2024,Beverages,high
 F-1504-2012,Food Additives/Ingredients,low
 F-1504-2013,Spices/Condiments,medium
 F-1504-2014,Spices/Condiments,medium
-F-1504-2015,Dairy,medium
+F-1504-2015,Prepared/Frozen,high
 F-1504-2016,Oils/Fats,high
 F-1504-2017,Snacks/Candy,high
 F-1504-2019,Bakery,high
@@ -18013,7 +18013,7 @@ F-1513-2024,Beverages,high
 F-1514-2012,Spices/Condiments,medium
 F-1514-2013,Bakery,medium
 F-1514-2014,Spices/Condiments,medium
-F-1514-2015,Dairy,medium
+F-1514-2015,Prepared/Frozen,high
 F-1514-2016,Bakery,high
 F-1514-2017,Bakery,medium
 F-1514-2019,Bakery,medium
@@ -18154,7 +18154,7 @@ F-1526-2023,Dairy,high
 F-1526-2024,Snacks/Candy,medium
 F-1527-2012,Dairy,low
 F-1527-2013,Dairy,high
-F-1527-2015,Dairy,medium
+F-1527-2015,Prepared/Frozen,high
 F-1527-2016,Spices/Condiments,medium
 F-1527-2017,Spices/Condiments,medium
 F-1527-2018,Supplements,high
@@ -18215,7 +18215,7 @@ F-1531-2024,Snacks/Candy,medium
 F-1532-2012,Food Additives/Ingredients,low
 F-1532-2013,Nuts/Seeds,high
 F-1532-2014,Spices/Condiments,low
-F-1532-2015,Dairy,medium
+F-1532-2015,Prepared/Frozen,high
 F-1532-2016,Snacks/Candy,medium
 F-1532-2017,Plant Protein,medium
 F-1532-2018,Spices/Condiments,high
@@ -18275,7 +18275,7 @@ F-1536-2024,Snacks/Candy,medium
 F-1537-2012,Spices/Condiments,medium
 F-1537-2013,Beverages,high
 F-1537-2014,Supplements,high
-F-1537-2015,Dairy,medium
+F-1537-2015,Prepared/Frozen,high
 F-1537-2016,Snacks/Candy,high
 F-1537-2017,Produce,high
 F-1537-2018,Bakery,high
@@ -19003,7 +19003,7 @@ F-1598-2017,Bakery,medium
 F-1598-2018,Snacks/Candy,high
 F-1598-2019,Bakery,high
 F-1598-2020,Produce,high
-F-1598-2022,Dairy,low
+F-1598-2022,Prepared/Frozen,high
 F-1598-2023,Supplements,high
 F-1598-2024,Dairy,high
 F-1599-2012,Produce,high
@@ -22147,7 +22147,7 @@ F-1922-2019,Beverages,high
 F-1923-2012,Produce,medium
 F-1923-2013,Supplements,high
 F-1923-2014,Bakery,high
-F-1923-2015,Dairy,high
+F-1923-2015,Prepared/Frozen,high
 F-1923-2016,Plant Protein,low
 F-1923-2017,Spices/Condiments,high
 F-1923-2018,Produce,high
@@ -22350,7 +22350,7 @@ F-1948-2017,Snacks/Candy,medium
 F-1948-2018,Produce,high
 F-1948-2019,Prepared/Frozen,medium
 F-1949-2012,Prepared/Frozen,medium
-F-1949-2013,Uncategorized,low
+F-1949-2013,Baby/Toddler Food,high
 F-1949-2014,Beverages,high
 F-1949-2015,Spices/Condiments,high
 F-1949-2016,Grains/Cereal,high
@@ -23588,7 +23588,7 @@ F-2148-2016,Dairy,high
 F-2148-2017,Supplements,high
 F-2148-2019,Seafood,high
 F-2149-2012,Prepared/Frozen,low
-F-2149-2014,Dairy,medium
+F-2149-2014,Prepared/Frozen,high
 F-2149-2015,Prepared/Frozen,high
 F-2149-2016,Dairy,high
 F-2149-2017,Supplements,high
@@ -24969,7 +24969,7 @@ F-2418-2015,Supplements,high
 F-2418-2016,Snacks/Candy,high
 F-2418-2017,Bakery,high
 F-2419-2014,Seafood,high
-F-2419-2015,Dairy,low
+F-2419-2015,Baby/Toddler Food,high
 F-2419-2016,Snacks/Candy,medium
 F-2419-2017,Bakery,high
 F-2420-2014,Seafood,high
@@ -27896,7 +27896,7 @@ H-0278-2025,Snacks/Candy,medium
 H-0278-2026,Plant Protein,medium
 H-0279-2025,Produce,medium
 H-0279-2026,Produce,high
-H-0280-2025,Dairy,medium
+H-0280-2025,Baby/Toddler Food,high
 H-0280-2026,Produce,high
 H-0281-2025,Snacks/Candy,high
 H-0281-2026,Produce,high
@@ -27953,7 +27953,7 @@ H-0306-2026,Non-Food Item,high
 H-0307-2025,Nuts/Seeds,medium
 H-0307-2026,Beverages,high
 H-0308-2025,Dairy,high
-H-0308-2026,Dairy,medium
+H-0308-2026,Baby/Toddler Food,high
 H-0309-2025,Dairy,high
 H-0309-2026,Supplements,low
 H-0310-2025,Dairy,high
@@ -28108,7 +28108,7 @@ H-0384-2025,Spices/Condiments,high
 H-0384-2026,Dairy,high
 H-0385-2025,Bakery,high
 H-0385-2026,Grains/Cereal,low
-H-0386-2025,Dairy,medium
+H-0386-2025,Baby/Toddler Food,high
 H-0386-2026,Spices/Condiments,high
 H-0387-2025,Produce,high
 H-0387-2026,Spices/Condiments,high
@@ -28604,7 +28604,7 @@ H-0632-2025,Dairy,high
 H-0632-2026,Snacks/Candy,high
 H-0633-2025,Dairy,high
 H-0633-2026,Beverages,high
-H-0634-2025,Dairy,medium
+H-0634-2025,Baby/Toddler Food,high
 H-0634-2026,Beverages,high
 H-0635-2025,Dairy,high
 H-0635-2026,Beverages,high
@@ -28905,7 +28905,7 @@ H-0934-2026,Bakery,medium
 H-0935-2026,Bakery,medium
 H-0936-2026,Bakery,high
 H-0937-2026,Bakery,medium
-H-0938-2026,Dairy,low
+H-0938-2026,Baby/Toddler Food,high
 H-0939-2026,Produce,high
 H-0940-2026,Prepared/Frozen,medium
 H-0941-2026,Prepared/Frozen,high
@@ -28955,11 +28955,11 @@ H-0984-2026,Bakery,high
 H-0985-2026,Bakery,high
 H-0986-2026,Dairy,low
 H-0987-2026,Uncategorized,low
-H-0988-2026,Uncategorized,low
+H-0988-2026,Beef/Pork/Poultry/Game Meats,high
 H-0989-2026,Dairy,low
 H-0990-2026,Dairy,medium
-H-0991-2026,Uncategorized,low
-H-0992-2026,Uncategorized,low
+H-0991-2026,Beef/Pork/Poultry/Game Meats,high
+H-0992-2026,Beef/Pork/Poultry/Game Meats,high
 H-0993-2026,Uncategorized,low
 H-0994-2026,Snacks/Candy,low
 H-0995-2026,Seafood,medium
@@ -28996,7 +28996,7 @@ H-1025-2026,Prepared/Frozen,high
 H-1026-2026,Dairy,medium
 H-1027-2026,Bakery,medium
 H-1028-2026,Bakery,high
-H-1029-2026,Uncategorized,low
+H-1029-2026,Beef/Pork/Poultry/Game Meats,high
 H-1030-2026,Bakery,medium
 H-1031-2026,Prepared/Frozen,medium
 H-1032-2026,Prepared/Frozen,medium
