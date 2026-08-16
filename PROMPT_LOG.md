@@ -773,3 +773,30 @@ which no longer rebuilds the file `DATA_PATH` points at post-Step-4 —
 fixed via TDD (new failing test, then patched both messages to name
 `build_classified_dataset.py` too). Full `.venv/bin/pytest` green; app
 restored and left running on `localhost:8501`.
+
+> "I noticed that there isn't a reset (all) filters button. Was that
+> missing from the list of requirements?"
+
+Checked the PRD and every project doc for "reset"/"clear filter" — never
+specified. Confirmed and said so directly rather than assuming it was an
+oversight on my part.
+
+> "Yeah I think that would be good. i'm actually not sure of the best
+> placement of the button for UX. Can you make a decision on this and
+> then also make sure to use TDD as the development approach."
+
+Decided placement (its own row directly below the four filter columns,
+left-aligned) and implemented via TDD: wrote `tests/test_app.py` using
+Streamlit's `AppTest` headless harness first (a button-exists check and
+a select-then-reset round trip asserting every widget and the Key
+Insights total return to defaults), watched both fail red, then added
+explicit `key=` params to the four filter widgets and a `_reset_filters`
+callback wired to a new button. Verified live via Playwright afterward
+(Eggs selected -> 64 events, Reset filters clicked -> back to 7,789).
+
+Hit a staging question mid-task: the new code lives inside app.py's
+Filters section, which turned out to have never been committed at all
+(`git show HEAD:app.py` was still the 114-line Phase 2 stub). Asked
+directly rather than guess whether to commit all of app.py now or leave
+it uncommitted again; Mai chose to commit it now, and noted she was
+disappointed it had been sitting uncommitted for as long as it had.

@@ -1942,3 +1942,66 @@ is left running on `localhost:8501`.
 error-UI gap's TDD cycle, logging.
 
 ---
+
+## Entry 27 — Post-Phase-5: "Reset filters" button
+
+**Goal**
+Mai noticed the QA pass never surfaced a missing "reset all filters"
+button -- checked the PRD and every project doc and confirmed it was
+never a stated requirement, then added it on request, TDD-first, with
+placement as a judgment call.
+
+**What I built**
+Added explicit `key=` params to the four filter widgets
+(`year_range`, `category_filter`, `reason_filter`, `severity_filter`) so
+their state is addressable, plus a `_reset_filters()` callback that
+writes each key's default back into `st.session_state` and a
+`st.button("Reset filters", on_click=_reset_filters, key=
+"reset_filters_button")` placed on its own row directly below the four
+filter columns -- visible immediately where the user just made changes,
+without crowding the already-narrow multiselect columns.
+
+Introduced `tests/test_app.py`, this project's first UI-level test, using
+Streamlit's headless `AppTest` harness (`streamlit.testing.v1`, bundled
+since 1.x, no browser needed) against the real derived CSV: one test
+asserts the button exists, the other selects a category/reason/severity
+and narrows the year slider, confirms the metric changed, clicks the
+button, and asserts every widget and the Key Insights total return
+exactly to their defaults. Watched both fail red (no button, then
+`FileNotFoundError` on the relative script path) before making them pass.
+
+**What worked**
+TDD caught a real mechanical detail immediately: Streamlit only lets a
+callback overwrite a widget's value via `st.session_state[key]` if that
+widget has an explicit `key=` -- the pre-existing widgets didn't, so the
+first test failure after adding the button was `StreamlitAPIException`
+until the four `key=` params were added. `AppTest` proved the reset
+behavior headlessly in under a second per run; a live Playwright pass
+against the running app afterward confirmed the same behavior pixel-for-
+pixel (select Eggs -> 64 events, click Reset filters -> back to 7,789).
+
+**What broke**
+Staging hit a real snag: the new code lives inside `app.py`'s Filters
+section, which -- it turned out on inspection -- was never actually
+committed. `git show HEAD:app.py` is still the 114-line Phase 2 stub with
+"Coming in Phase 3" placeholders; the 289-line version with Filters/Key
+Insights/Trend/Top-foods has been sitting uncommitted in the working tree
+since before this session (per the standing instruction about app.py's
+pre-existing uncommitted work). Unlike Step 5's About-section edit, which
+could be isolated with `git apply --cached` because that block's context
+already existed in HEAD, there was no committed anchor here to patch
+against. Asked Mai directly rather than guess; she chose to commit all of
+app.py now rather than continue leaving it uncommitted.
+
+**What I changed**
+`app.py`, `tests/test_app.py` (new). Committed the entire current
+`app.py` -- the reset button along with the rest of the not-previously-
+committed Phase 3/4 work it lives inside.
+
+**Open questions**
+None.
+
+**Time spent**
+~25 minutes: TDD cycle, live verification, the staging question, logging.
+
+---
