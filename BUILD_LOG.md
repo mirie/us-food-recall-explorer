@@ -946,3 +946,66 @@ pressure-testing the log's coverage against the real data, reconciling an
 internally contradictory `effort` recommendation).
 
 ---
+
+## Entry 12 — Step 1 taxonomy finalization: prep and design sample (in progress)
+
+**Goal**
+Execute Step 1 of the reviewed plan
+(`.claude/plans/read-handoff-phase5-llm-merge-md-first-t-purrfect-lynx.md`):
+finalize the taxonomy against a ~5,000-row design sample via one Opus 5 API
+call, and show the proposal before writing `CLASSIFICATION_RULES.md` or
+touching `CATEGORY_ENUM`.
+
+**What I found**
+The handoff (`HANDOFF_PHASE5_FULL_RECLASSIFICATION.md`) claimed the recovered
+decision log was "reproduced in full inside the plan file." It wasn't — the
+plan file only carried a summary (label list, four open questions, gap
+table), not the actual per-category rules or the 10 boundary rules. Mai
+re-supplied the full log directly; it's now saved at
+`scratch/decision_log.md` (not checked in, per the plan — it's the seed
+content for the eventual `CLASSIFICATION_RULES.md`, written only after
+approval).
+
+**What I built**
+- Confirmed prerequisites: `.venv/bin/pytest` 134 passed; `ant auth status`
+  live (`mai.irie@gmail.com`, `user:inference` scope); `ANTHROPIC_API_KEY`
+  unset.
+- Installed the `anthropic` SDK (0.122.0) and its transitive deps into
+  `requirements.txt`, keeping the existing pinned-freeze convention rather
+  than a full `pip freeze` overwrite (which would have pulled in unrelated
+  dev-only packages like `pytest`/`playwright` that aren't part of this
+  pinned file's scope).
+- Built the design sample (`scratch/build_design_sample.py`, `scratch/design_sample.csv`,
+  neither checked in): all 466 rows from the five categories the log never
+  saw evidence for (`Poultry/Eggs` 208, `Pork` 88, `Beef` 65, `Plant Protein`
+  55, `Oils/Fats` 50 — confirmed via `load_recalls()["category"].value_counts()`,
+  matching the plan's numbers exactly), plus 801 rows pulled by keyword for
+  the six coverage-hole product types, plus 3,733 stratified from the
+  remaining eleven categories. Total: exactly 5,000 rows.
+
+**What broke**
+A first pass at the coffee-creamer keyword (`creamer` with no word boundary)
+matched 237 rows — but 180 of those were "Creamery" (a dairy-brand name
+substring), not creamer products. The same class of bug `categories.py`
+already documents (`clamshell` → `Seafood`, 509 rows). Added a trailing
+`\b` and the true count is 57. The plan's original coverage-hole estimates
+(alcohol 262, coffee creamer 237, broth 82, baby food 62) were themselves
+rough; my keyword counts came out different in most cases (alcohol 277,
+creamer 57, broth 67, baby food 25) — real evidence either way, so the
+sample proceeds with the measured counts rather than reconciling to the
+estimates.
+
+**What I changed**
+Nothing in `recall_explorer/` yet. Only `requirements.txt` (the `anthropic`
+dependency) is a real repo change so far; `scratch/decision_log.md` and the
+design-sample script/CSV are intentionally not checked in.
+
+**Open questions**
+None new — the four from the decision log's "Known gaps" section are still
+open, to be resolved by the upcoming API call against this sample.
+
+**Time spent**
+~45 minutes: recovering the decision log, verifying prerequisites, installing
+the SDK, and building/debugging the design sample.
+
+---

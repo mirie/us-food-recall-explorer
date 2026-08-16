@@ -484,3 +484,34 @@ Result: this entry, the matching `BUILD_LOG.md` Entry 11, and a `LEARNINGS.md` a
 
 ---
 
+## Session — Step 1 execution: recovering the decision log, building the design sample
+
+> "Read HANDOFF_PHASE5_FULL_RECLASSIFICATION.md, then the plan it points to... Run .venv/bin/pytest first... Then check `ant auth status`... Start at Step 1 of the plan... Show me the proposed label set and the four open-question resolutions before writing anything else."
+
+Result: confirmed prerequisites (134 tests passing, `ant auth status` live,
+`ANTHROPIC_API_KEY` unset), then found the handoff's claim that the decision
+log was "reproduced in full inside the plan file" was false — only a summary
+existed. Surfaced this as a blocker via a clarifying question rather than
+fabricating the missing per-category rules and 10 boundary rules.
+
+> [Answered: "You'll re-paste the log"] [pasted the full decision log]
+
+Result: saved the log verbatim to `scratch/decision_log.md` (not checked in —
+seed content for `CLASSIFICATION_RULES.md`, written only after approval).
+Installed the `anthropic` SDK into `requirements.txt`, keeping the existing
+pinned-freeze convention instead of a blind `pip freeze` overwrite that would
+have pulled in unrelated dev-only packages. Built the ~5,000-row design
+sample: the 466-row exhaustive slice (confirmed the plan's category counts
+exactly via `load_recalls()`), coverage-hole rows by keyword, and a
+stratified remainder. Caught a `creamer`-vs-`Creamery` substring bug in my
+own first keyword pass (same class as `categories.py`'s documented
+`clamshell` bug) before it silently inflated the coffee-creamer count.
+
+> [Mid-turn] "make sure to update the build_log, etc files and git commit along the way too please"
+
+Result: logging prep work to `BUILD_LOG.md` (Entry 12) and this entry, then
+committing `requirements.txt` alone — not the unrelated pre-existing modified
+files the earlier handoff flagged as deliberately left uncommitted.
+
+---
+
