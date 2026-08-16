@@ -1781,3 +1781,85 @@ anticipated failures for Step 5.
 the fetch_data.py comment, and verification.
 
 ---
+
+## Entry 25 -- Phase 5 Step 5: tests and documentation
+
+**Goal**
+Close out the two anticipated post-Step-4 test failures, rewrite the
+tests that exercised the retired `apply_llm_category_override`, add a
+coverage test for the derived file, and bring the About section's
+user-facing claims in line with the Phase 5 reclassification.
+
+**What I built**
+`tests/test_pipeline.py`:
+- `test_uncategorized_share_stays_within_documented_bounds` retargeted
+  from the old keyword-era 8-16% band to 0.3-2%, bracketing the measured
+  211/29,159 (0.72%) figure from BUILD_LOG Entry 22-23 / Step 3b.
+- The three `apply_llm_category_override` tests (which called a function
+  that no longer exists) replaced with three tests against `load_recalls`
+  itself, since the category-derivation logic is now inlined rather than
+  a standalone pure function: label present -> used; blank -> falls back
+  to `Uncategorized`; and a dedicated no-keyword-inference test proving a
+  blank `llm_category` on a row with an obviously keyword-matchable
+  description ("Whole milk, 1 gallon") still lands on `Uncategorized`
+  rather than `Dairy`. All three build a synthetic 29,000-row CSV via a
+  `_make_classified_csv` helper so `validate_schema()`'s row-count floor
+  doesn't block testing the two-line derivation in isolation.
+- New `test_classified_csv_has_llm_category_for_essentially_every_row`
+  asserts <0.1% of rows in the real derived file are missing
+  `llm_category` (measured: 2/29,161, the same two blank-`recall_number`
+  rows `load_recalls()` already excludes).
+
+`tests/test_schema_guardrail.py`: `test_columns_match_exactly_and_in_order`
+now asserts an ordered prefix (`list(raw.columns)[:len(EXPECTED_COLUMNS)]
+== EXPECTED_COLUMNS`) instead of exact equality, so the derived file's
+appended `llm_category` column no longer trips it, while a fresh
+`fetch_data.py` run (no `llm_category` at all) still passes.
+
+`tests/test_llm_categories.py`'s doc<->code sync test
+(`test_category_enum_matches_classification_rules_doc`) and the deleted
+`categories.py`-derived-enum import were already done as part of Step 1 --
+verified them still passing rather than re-doing the work.
+
+`data/fetch_metadata.json`'s `llm_classification_pass` block was already
+complete from Step 3b (timestamp, model, row count, taxonomy, before/after
+Uncategorized share, confidence distribution, all six Step 3b figures, and
+the Batch-API-supersedes-manual-round-trip note) -- nothing to add.
+
+`app.py`'s About section (~line 245): rewrote the two stale bullets. The
+meat bullet now scopes the FDA/USDA jurisdiction gap to meat and poultry
+specifically and notes shell eggs are FDA-regulated and have their own
+`Eggs` category (142 rows). The keyword/coverage bullet now states the
+LLM classification pass (Claude Opus 5, full 29,159-row dataset), the
+0.72% Uncategorized share, and the 96.1% self-consistency accuracy signal,
+pointing to `CLASSIFICATION_RULES.md` and `BUILD_LOG.md` for the full
+validation record.
+
+**What worked**
+TDD on the two test-only retargets (uncategorized share, schema prefix)
+and the `load_recalls`-based rewrites: watched each fail for the expected
+reason under the pre-Step-4 code shape, then confirmed green.
+`.venv/bin/pytest` fully green, no `--continue-on-collection-errors`
+needed. `categories.py`'s 31 tests untouched and passing.
+`load_recalls()["category"].value_counts()` shows exactly the 21
+approved-taxonomy categories, `Uncategorized` at 211 rows, no leftover
+keyword-era labels. `grep assign_category recall_explorer/pipeline.py`
+still empty.
+
+**What broke**
+Nothing outside the two anticipated failures, both closed as planned.
+
+**What I changed**
+Nothing beyond the plan's Step 5 scope. `app.py` had substantial unrelated
+pre-existing uncommitted work (Phase 3/4 filters, insights, styling); only
+the About-section hunk was staged for this commit.
+
+**Open questions**
+None -- Step 5's verification checklist (pytest green, `categories.py`
+untouched, category value_counts sane) is fully satisfied. Step 6 (live QA)
+is next.
+
+**Time spent**
+~30 minutes: test rewrites, About section, verification, logging.
+
+---

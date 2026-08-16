@@ -32,7 +32,11 @@ def test_snapshot_file_exists():
 
 
 def test_columns_match_exactly_and_in_order(raw):
-    assert list(raw.columns) == EXPECTED_COLUMNS
+    # DATA_PATH now points at the Phase 5 derived file (raw snapshot +
+    # appended llm_category), so assert the raw columns as an ordered prefix
+    # rather than exact equality -- a fresh fetch_data.py run must still
+    # produce a file that passes validate_schema() on its own.
+    assert list(raw.columns)[:len(EXPECTED_COLUMNS)] == EXPECTED_COLUMNS
 
 
 def test_snapshot_has_a_plausible_number_of_rows(raw):

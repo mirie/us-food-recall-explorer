@@ -710,3 +710,32 @@ refactored `pipeline.py`, commented `fetch_data.py`, verified with the
 plan's own checklist (`grep assign_category`, raw CSV untouched, derived
 CSV coverage, `pytest --continue-on-collection-errors` showing only the
 anticipated Step 5 failures).
+
+---
+
+Prompt (Step 5 kickoff, new session):
+
+> Read the master plan's "Step 5 — Tests and documentation" section and
+> BUILD_LOG.md Entry 24. Steps 1-4 are done and committed. Do Step 5:
+> retarget the uncategorized-share test, switch the schema guardrail to
+> a prefix assertion, replace the enum-subset assertion with a
+> doc<->code sync test, rewrite the three apply_llm_category_override
+> tests against the new direct-read behavior, add a coverage test for
+> llm_category, fill in fetch_metadata.json's llm_classification_pass
+> block if anything's missing, and rewrite the About section's two
+> stale bullets. Follow TDD. Standing instruction: update
+> BUILD_LOG.md/PROMPT_LOG.md and commit along the way, staging only
+> what each commit's diff touches — app.py in particular has unrelated
+> pre-existing uncommitted work mixed in.
+
+Executed as specified. The doc<->code sync test and the
+`fetch_metadata.json` block turned out already complete from Steps 1 and
+3b respectively — verified rather than redone. Everything else followed
+TDD: watched the uncategorized-share and schema-prefix tests fail under
+the pre-edit code, then made them pass; wrote the three replacement
+`load_recalls`-based tests and the new coverage test against a synthetic
+CSV fixture (`apply_llm_category_override` no longer exists as a
+standalone function, so testing through `load_recalls` was the only way
+to exercise the real derivation logic). Full `.venv/bin/pytest` green, no
+`--continue-on-collection-errors` needed; `categories.py`'s 31 tests
+untouched.

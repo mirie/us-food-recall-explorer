@@ -89,13 +89,17 @@ st.divider()
 with st.expander("About the data & limitations"):
     st.markdown(
         """
-- **openFDA covers FDA-regulated food only.** Meat, poultry, and processed
-  egg products are USDA FSIS jurisdiction and are absent from this dataset —
-  which is why the meat categories are near-empty. This is a property of the
-  data source, not evidence that meat is rarely recalled.
-- **Category is keyword-derived and lossy.** About 12% of rows are
-  `Uncategorized`, which is a measure of coverage, not correctness — accuracy
-  on the labeled ~88% has never been independently measured.
+- **openFDA covers FDA-regulated food only.** Meat and poultry are USDA FSIS
+  jurisdiction and are absent from this dataset — which is why the meat
+  categories are near-empty. Shell eggs, however, are FDA-regulated and appear
+  under their own `Eggs` category. Near-empty meat is a property of the data
+  source, not evidence that meat is rarely recalled.
+- **Category comes from an LLM classification pass** (Claude Opus 5, full
+  29,159-row dataset) that replaced an earlier keyword-based approach. Only
+  0.72% of rows are `Uncategorized`, down from the keyword pass's 12.2%. A
+  self-consistency check (an independent second pass over 1,000 rows) found
+  96.1% agreement, with zero disagreements among high-confidence labels — see
+  `CLASSIFICATION_RULES.md` and `BUILD_LOG.md` for the full validation.
 - **Reason tags are multi-label.** Any reported share is "of recalls
   mentioning X," never "share of all recalls."
 - **Recall counts are not a food-safety measure.** Changes over time may

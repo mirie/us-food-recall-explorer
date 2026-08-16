@@ -13,6 +13,7 @@ import pandas as pd
 import pytest
 
 from recall_explorer.pipeline import load_recalls
+from recall_explorer.schema import EXPECTED_COLUMNS, MIN_EXPECTED_ROWS
 from recall_explorer.transforms import count_by
 
 # The raw 2026-08 snapshot holds 29,161 rows / 7,791 events. Two rows carry a
@@ -83,13 +84,14 @@ def test_every_row_gets_a_category(df):
 
 
 def test_uncategorized_share_stays_within_documented_bounds(df):
-    # Documented in the About section as ~12%. A large move means the rules
-    # changed materially and the documentation needs updating with them --
-    # which is exactly how this bound earned its keep: expanding the keyword
-    # set dropped the share from 18.4% to 11.9% and failed this test, rather
-    # than letting the docs quietly go stale.
+    # Post Phase-5 LLM reclassification, measured at 211/29,159 (~0.72%) --
+    # see BUILD_LOG.md Entry 22-23 and fetch_metadata.json's
+    # llm_classification_pass block. A large move means the classification
+    # pass changed materially and the documentation needs updating with it --
+    # which is exactly how this bound earned its keep under the old
+    # keyword-derived category (it caught an 18.4%-to-11.9% rules change).
     share = (df["category"] == "Uncategorized").mean()
-    assert 0.08 <= share <= 0.16
+    assert 0.003 <= share <= 0.02
 
 
 def test_uncategorized_is_no_longer_the_largest_category(df):
@@ -106,3 +108,63 @@ def test_reason_tags_are_lists_not_strings(df):
     # A CSV round-trip would turn these into strings and silently break any
     # downstream explode/filter on them.
     assert isinstance(df["reason_tags"].iloc[0], list)
+
+
+# --- Category derivation: direct read of llm_category (Phase 5) ------------
+# Post-refactor, pipeline.py no longer runs assign_category() or any keyword
+# override at load time -- category comes straight from the derived file's
+# llm_category column, blank falling back to Uncategorized. Exercised through
+# load_recalls() itself (rather than a standalone pure function, since the
+# refactor deliberately inlined this) against a synthetic CSV built to clear
+# validate_schema()'s 29,000-row floor, with three planted rows.
+
+def _make_classified_csv(tmp_path, special_rows):
+    filler = {col: "x" for col in EXPECTED_COLUMNS}
+    filler.update(
+        {
+            "recall_number": "F-0000-2020",
+            "event_id": "1",
+            "product_description": "filler product",
+            "reason_for_recall": "filler reason",
+            "recall_initiation_date": "20200101",
+        }
+    )
+    rows = [dict(filler, llm_category="Produce") for _ in range(MIN_EXPECTED_ROWS)]
+    for i, special in enumerate(special_rows):
+        rows[i] = dict(filler, recall_number=f"F-SPECIAL-{i}", **special)
+
+    path = tmp_path / "classified.csv"
+    pd.DataFrame(rows, columns=EXPECTED_COLUMNS + ["llm_category"]).to_csv(path, index=False)
+    return path
+
+
+def test_llm_category_label_present_is_used(tmp_path):
+    path = _make_classified_csv(
+        tmp_path, [{"product_description": "Vitamin C tablets", "llm_category": "Supplements"}]
+    )
+    out = load_recalls(path)
+    assert out.loc[out["recall_number"] == "F-SPECIAL-0", "category"].iloc[0] == "Supplements"
+
+
+def test_llm_category_blank_falls_back_to_uncategorized(tmp_path):
+    path = _make_classified_csv(
+        tmp_path, [{"product_description": "Assorted items", "llm_category": ""}]
+    )
+    out = load_recalls(path)
+    assert out.loc[out["recall_number"] == "F-SPECIAL-0", "category"].iloc[0] == "Uncategorized"
+
+
+def test_no_keyword_inference_at_load_time(tmp_path):
+    # "milk" would have keyword-matched Dairy under the retired assign_category
+    # rules. With llm_category blank, the row must fall back to Uncategorized
+    # rather than any keyword ever inferring a category again.
+    path = _make_classified_csv(
+        tmp_path, [{"product_description": "Whole milk, 1 gallon", "llm_category": ""}]
+    )
+    out = load_recalls(path)
+    assert out.loc[out["recall_number"] == "F-SPECIAL-0", "category"].iloc[0] == "Uncategorized"
+
+
+def test_classified_csv_has_llm_category_for_essentially_every_row(df):
+    missing_share = (df["llm_category"].isna() | (df["llm_category"].str.strip() == "")).mean()
+    assert missing_share < 0.001
