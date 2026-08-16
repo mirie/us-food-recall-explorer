@@ -513,5 +513,19 @@ Result: logging prep work to `BUILD_LOG.md` (Entry 12) and this entry, then
 committing `requirements.txt` alone — not the unrelated pre-existing modified
 files the earlier handoff flagged as deliberately left uncommitted.
 
+Result (continued): ran the taxonomy-finalization API call. First attempt
+truncated at `max_tokens=16000` because adaptive thinking consumed nearly
+all of it (15K of 16K tokens) before any response text — raised to 48000 and
+reran clean. The proposal came back with 20 labels (not the plan's expected
+19): both `Eggs` and a new `Baby/Toddler Food` label, the latter because a
+single infant-formula/puree product line was fragmenting three to four ways
+under the recovered log's ingredient-based rules. Also surfaced a real
+behavior change beyond the four open questions — protein powders and RTD
+shakes move from `Plant Protein` (per the log) to `Supplements` regardless
+of protein source — and 8 total new label collisions with cited recall
+numbers as evidence. Logged the full result to `BUILD_LOG.md` Entry 13
+before presenting the proposal to Mai for approval, per Step 1's rule that
+nothing gets written to `CLASSIFICATION_RULES.md` or `CATEGORY_ENUM` first.
+
 ---
 

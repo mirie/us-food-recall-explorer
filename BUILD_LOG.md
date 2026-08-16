@@ -1009,3 +1009,90 @@ open, to be resolved by the upcoming API call against this sample.
 the SDK, and building/debugging the design sample.
 
 ---
+
+## Entry 13 — Step 1 taxonomy finalization: the design-sample API call
+
+**Goal**
+Run the taxonomy-finalization call (Opus 5, `effort: high`) against the
+5,000-row design sample and get a proposal to show Mai, per Step 1's
+"nothing written until approved" rule.
+
+**What I built**
+`scratch/run_taxonomy_finalization.py` (not checked in): system prompt =
+`scratch/decision_log.md` verbatim + a task wrapper (apply the log's rules,
+resolve the four open questions with sample evidence, write rules for the
+six coverage-hole types, flag new collisions, propose the final label set).
+User message = the 5,000-row sample CSV. `client.messages.stream(...)`,
+`model="claude-opus-5"`, `effort: "high"`, no explicit `thinking` param
+(adaptive by default on this model per the SDK skill's guidance).
+
+**What broke**
+First run: `max_tokens=16000` truncated mid-response. Adaptive thinking used
+14,959 of those tokens, leaving ~1,000 for the actual proposal text — Opus 5
+counts thinking against `max_tokens` unless thinking is disabled. Reran at
+`max_tokens=48000`; the full response completed at 37,998 output tokens
+(21,638 thinking + ~16,360 text).
+
+**What I got**
+Cost: 622,299 input tokens (~$3.11), 37,998 output tokens (~$0.95) — about
+$4 for this one design call. The proposal (`scratch/taxonomy_proposal.md`,
+not checked in) is substantially more thorough than Step 1 anticipated:
+
+- **20 labels**, not the expected "18 + Eggs = 19." A second new label,
+  `Baby/Toddler Food`, emerged from evidence the plan already flagged as a
+  coverage hole but hadn't sized as label-worthy — the sample showed a
+  single product line (infant purees, infant formula across protein bases)
+  fragmenting three to four ways under the log's ingredient-based rules.
+- All four open questions resolved with cited row evidence rather than
+  general reasoning: add `Eggs` (~60+ rows with no home in the 18); the
+  milk/produce/meat rules mostly hold with two dairy additions and one
+  produce clarification (fresh vs. dried herbs); `Oils/Fats` confirmed with
+  an expanded boundary; full relabel confirmed, with a table of specific
+  keyword-labeling error classes (buns matched on "hamburger," seasonings
+  matched on the meat they season, plant analogs matched on the animal they
+  imitate) as the evidence a forward mapping can't fix.
+- All six coverage-hole types resolved: alcohol and coffee creamer →
+  `Beverages`; broth split by concentration (liquid → `Prepared/Frozen`,
+  bases/bouillon → `Spices/Condiments`); baby food → the new
+  `Baby/Toddler Food` label, which also absorbs all infant formula
+  (superseding the log's protein-based formula split); honey →
+  `Spices/Condiments` with a carve-out for claim-bearing sachets →
+  `Supplements`; agave/stevia/molasses → `Spices/Condiments`, with dry
+  crystalline sugar staying `Baking Supplies` and bulk purified compounds
+  going to `Food Additives/Ingredients`.
+- **8 new label collisions** beyond the log's 10 boundary rules, each
+  evidenced with specific recall numbers: meat-named seasonings/rubs/
+  marinades → `Spices/Condiments`; deli sandwiches → `Prepared/Frozen`;
+  plant-based analogs classified by composition not by what they imitate;
+  dressed deli salads split by dominant ingredient; hummus/dips three-way
+  split; medical/enteral nutrition → `Supplements`; **protein powders and
+  RTD shakes → `Supplements` regardless of protein source** (a real change
+  from the log, which had them in `Plant Protein`); non-food items
+  (pet food, cosmetic kits) confirmed as `Non-Food Item`.
+- The model flagged its own evidence gaps rather than papering over them:
+  raw single-ingredient meat cuts are essentially absent from FDA data
+  (USDA jurisdiction), so the merged meat label is validated only against
+  deli/cured/cooked meat; `Baking Supplies` had no direct sample coverage
+  at all and its boundaries were inferred from adjacent rows.
+
+**What I changed**
+Nothing in `recall_explorer/`, `CLASSIFICATION_RULES.md`, or `data/` — per
+Step 1's plan, the proposal is presented to Mai for approval before any of
+that gets written. Only `scratch/run_taxonomy_finalization.py` (script) and
+`scratch/taxonomy_proposal.md` (output), neither checked in.
+
+**Open questions**
+Whether Mai approves 20 labels (vs. the plan's expected ~19) — specifically
+the two new labels (`Eggs`, `Baby/Toddler Food`) and the protein-powder
+reclassification into `Supplements`, which is a real behavior change from
+the recovered log, not just a gap-fill. If approved, Step 2's classification
+script needs the finalized enum plus a note that `Beef/Pork/Poultry/Game
+Meats` boundaries now explicitly exclude several product types (seasonings,
+buns, sandwiches, plant analogs) that a keyword match on a meat word would
+have caught.
+
+**Time spent**
+~15 minutes: writing and debugging the prompt/script, two API calls (~5 min
+combined including the truncated first attempt), reviewing the output.
+
+---
