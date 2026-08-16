@@ -548,3 +548,21 @@ the first call already gathered, not new analysis.
 
 ---
 
+
+## Session — v2 correction: plant-based coffee creamer
+
+Mai's message: "okay just help me sort thru something real quick. Does
+plant-based coffee creamer have plant protein in it? I made an assumption
+but I actually might be totally wrong"
+
+Re-checked v1's cited evidence for the coffee-creamer rule and found it was
+entirely brand-name examples, never ingredient/protein content. Recommended
+un-bundling plant-based creamer from plant milk: real plant creamer is
+mostly oil/thickener/sugar with near-zero protein, unlike plant milk itself
+which is a genuine protein-bearing beverage. Mai agreed; updated
+`scratch/taxonomy_proposal_v2.md` so coffee creamer is a two-way split
+(dairy → `Dairy`, everything else including plant-based → `Beverages`)
+instead of three-way, while plant milk keeps its `Plant Protein` placement
+unchanged.
+
+---

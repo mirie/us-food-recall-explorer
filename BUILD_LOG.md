@@ -1152,3 +1152,50 @@ Pending: Mai's final approval of the 21-label v2 set before
 writing the revision document.
 
 ---
+
+## Entry 15 — Correcting the plant-based coffee creamer call in v2
+
+**Goal**
+Sanity-check one piece of v2's own revision before it goes to Mai for final
+approval: does plant-based coffee creamer actually contain meaningful plant
+protein, the way plant milk does? Mai asked this directly rather than
+accepting the v2 draft's assumption at face value.
+
+**What I built**
+Re-read v1's actual cited evidence for the coffee-creamer rule (all brand
+examples — Coffee-Mate, Silk, International Delight, MO-CHA, Kraft,
+Libby's) and found it never examined ingredient or protein content; it only
+used inconsistent keyword-labeling of near-identical products as the reason
+to standardize on `Beverages`. Real plant-based coffee creamer is
+typically water, oil (often coconut/sunflower, not the named plant milk),
+sugar, and thickeners/emulsifiers — an additive product with ~0g protein
+per serving, unlike oat/soy/almond milk itself, which is sold and consumed
+as the primary protein-bearing beverage/food.
+
+**What worked**
+Separating "plant milk" from "plant-based coffee creamer" — they'd been
+folded together under the same composition-over-destination principle in
+v2, but only one of them is actually a protein-bearing plant food.
+
+**What broke**
+Nothing broke; this is a correction to the v2 draft before it was ever
+presented as final, not a rework of already-approved output.
+
+**What I changed**
+`scratch/taxonomy_proposal_v2.md`: reverted plant-based coffee creamer from
+`Plant Protein` back to `Beverages` (its v1 fallback). Plant milk keeps its
+`Plant Protein` placement — unaffected. Coffee creamer is now a two-way
+split (dairy → `Dairy`; everything else, including plant-based → 
+`Beverages`), not three-way. Updated the "What changed vs. v1" table, the
+label-set summary table (`Plant Protein` and `Beverages` rows), and the
+detailed rule text for both labels, plus added an explicit correction note
+explaining why plant milk and plant creamer are treated differently despite
+both being "plant-based."
+
+**Open questions**
+None. Ready to present the corrected v2 set for final approval.
+
+**Time spent**
+~10 minutes.
+
+---
