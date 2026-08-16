@@ -1724,3 +1724,60 @@ calls (including a follow-up correction on the deli-tray split), updating
 the rules doc and metadata.
 
 ---
+
+## Entry 24 — Phase 5 Step 4: derived dataset and pipeline refactor
+
+**Goal**
+With Step 3b's validation gate cleared (211/29,159 Uncategorized, 0.72%),
+join the raw snapshot with the final classification into a derived file
+and point the app at it, retiring `assign_category` from the runtime
+path.
+
+**What I built**
+`build_classified_dataset.py` (repo root): reads `data/food_recalls.csv`
+and `data/recall_categories_llm_full.csv`, left-joins on `recall_number`,
+writes `data/food_recalls_classified.csv` -- the 19 raw columns in their
+original order plus `llm_category`. `confidence` is deliberately left
+behind in the classification CSV; it's a review artifact, not something
+the app reads. 29,161 rows written; 2 without an `llm_category` -- the
+same two blank-`recall_number` rows `load_recalls()` already excludes
+(event_ids 99068, 99205), so they're inert.
+
+`recall_explorer/pipeline.py` refactored: `DATA_PATH` now points at
+`data/food_recalls_classified.csv`; the `categories.py` import and
+`apply_llm_category_override` are gone. Category assignment is now a
+direct read:
+
+```python
+df["category"] = df["llm_category"].fillna("").str.strip()
+df.loc[df["category"] == "", "category"] = UNCATEGORIZED
+```
+
+`categories.py` itself is untouched -- stays in the repo, frozen, its 31
+tests still passing, as historical documentation of the keyword rules'
+five failure classes.
+
+Added a comment to `fetch_data.py`: it rebuilds the raw snapshot only,
+and `build_classified_dataset.py` must be re-run afterward.
+
+**What worked**
+`grep assign_category recall_explorer/pipeline.py` returns nothing.
+`data/food_recalls.csv` stayed byte-identical throughout (`git status`
+clean on it before and after). `.venv/bin/pytest --continue-on-collection-
+errors` shows exactly the failures the master plan's Step 5 anticipated
+and no others: `test_pipeline.py` fails to import (it still references
+the now-deleted `apply_llm_category_override`, which also covers its
+uncategorized-share-bound test), and
+`test_columns_match_exactly_and_in_order` fails on the appended
+`llm_category` column. Both are Step 5's job, not this one's.
+
+**What I changed**
+Nothing beyond the plan's three Step 4 deliverables -- no test files
+touched, per the plan's explicit instruction to leave the four
+anticipated failures for Step 5.
+
+**Time spent**
+~15 minutes: writing and running the join script, the pipeline refactor,
+the fetch_data.py comment, and verification.
+
+---

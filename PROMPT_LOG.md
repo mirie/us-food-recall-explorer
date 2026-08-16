@@ -692,3 +692,21 @@ revision entry closing the human-milk and sorbet doc gaps for any future
 re-run. Uncategorized: 231 -> 211 (0.72%) across the two commits.
 
 ---
+
+Prompt (Step 4 kickoff, new session):
+
+> Read the master plan's "Step 4 — Derived dataset and pipeline refactor"
+> section and BUILD_LOG.md Entries 22-23. Steps 1-3b are done and
+> committed. Do Step 4: build_classified_dataset.py joining the raw
+> snapshot with the final classification CSV; refactor pipeline.py to
+> drop assign_category from the runtime path in favor of a direct
+> llm_category read; add a comment to fetch_data.py. Don't touch test
+> files -- that's Step 5. Update BUILD_LOG.md/PROMPT_LOG.md and commit
+> along the way, staging only what each commit's diff touches -- the repo
+> has unrelated pre-existing uncommitted work that must stay untouched.
+
+Executed as specified: wrote `build_classified_dataset.py`, ran it,
+refactored `pipeline.py`, commented `fetch_data.py`, verified with the
+plan's own checklist (`grep assign_category`, raw CSV untouched, derived
+CSV coverage, `pytest --continue-on-collection-errors` showing only the
+anticipated Step 5 failures).

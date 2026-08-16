@@ -3,6 +3,10 @@
 Run manually. The Streamlit app never imports or calls this module -- it only
 reads the CSV this script produces.
 
+This script rebuilds data/food_recalls.csv, the raw snapshot, only.
+build_classified_dataset.py must be re-run afterward to regenerate
+data/food_recalls_classified.csv, the file the app actually reads.
+
     python fetch_data.py --dry-run      # counts only, writes nothing
     python fetch_data.py --limit 1      # smoke test one real row
     python fetch_data.py                # full fetch

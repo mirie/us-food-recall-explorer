@@ -1,22 +1,27 @@
-"""Load the static snapshot and apply every derivation the app depends on.
+"""Load the classified snapshot and apply every derivation the app depends on.
 
 The one place that touches the filesystem. Everything it calls is a pure
 function, so the interesting logic stays unit-testable without file I/O.
 
-This module makes no network calls. The snapshot is built once by
-fetch_data.py, run manually and outside the app.
+This module makes no network calls. data/food_recalls_classified.csv is built
+once, outside the app, by fetch_data.py (raw snapshot) followed by
+build_classified_dataset.py (join against the Phase 5 LLM classification --
+see CLASSIFICATION_RULES.md and BUILD_LOG.md's Phase 5 entries). Category
+labels come entirely from that LLM pass; categories.py's keyword rules are
+frozen historical documentation and are no longer part of the runtime path.
 """
 
 from pathlib import Path
 
 import pandas as pd
 
-from recall_explorer.categories import assign_category
 from recall_explorer.reasons import tag_reasons
 from recall_explorer.schema import validate_schema
 from recall_explorer.transforms import parse_recall_dates
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "food_recalls.csv"
+DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "food_recalls_classified.csv"
+
+UNCATEGORIZED = "Uncategorized"
 
 # openFDA's enforcement reports begin in 2012. Rows outside the window are
 # back-filled stragglers too sparse to chart honestly -- see BUILD_LOG Entry 1.
@@ -52,7 +57,8 @@ def load_recalls(path=None):
 
     df["year"] = df["year"].astype(int)
     df["month"] = df["month"].astype(int)
-    df["category"] = df["product_description"].map(assign_category)
+    df["category"] = df["llm_category"].fillna("").str.strip()
+    df.loc[df["category"] == "", "category"] = UNCATEGORIZED
     df["reason_tags"] = df["reason_for_recall"].map(tag_reasons)
 
     return df.reset_index(drop=True)
