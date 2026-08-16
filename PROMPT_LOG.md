@@ -645,3 +645,50 @@ recovered cleanly on the first retry. Final file: 29,159/29,159 rows, 0
 missing, 0 unexpected. Uncategorized dropped from 12.2% to 0.8%.
 
 ---
+
+## Session — Step 3b: six validation checks, then Mai's manual review
+
+Opening prompt (via a plan file, abridged): "Read the plan's Step 3b —
+Validation section... Run Step 3b's six validation checks... If any check
+fails badly, surface it and propose a fix rather than pushing forward —
+Step 4's pipeline refactor is gated on this step passing."
+
+Ran all six checks (self-consistency via a second independent Batch API
+pass, agreement with the 3,554 manually-reviewed rows, confidence triage,
+category coherence, keyword-vs-LLM disagreement, full residual read of
+all 231 Uncategorized rows). All six passed; residual inspection caught
+one fixable bug (13 rows matching the exact "BATTER MIX X1, 50 LBS"
+pattern the rules doc's own worked example covers, landed in
+Uncategorized anyway) — patched directly rather than re-running the batch.
+
+> "Should I manually review any particular rows?"
+
+Surfaced five genuinely judgment-call clusters from the check data rather
+than claiming the checks caught everything: donor human breast milk
+(split across three labels inconsistently), sorbet (split ~90/10 between
+Prepared/Frozen and Dairy), a "Gravy Beef" boundary case, an "American
+Substitute Turkey" boundary case, and a cluster of bare Albertson's deli
+tray/platter codes.
+
+Mai's answers (verbatim calls on each):
+> "F-2419-2015, F-0017-2015 (+ one in the residual list) — 'Mother's
+> Milk'/donated human breast milk: should be Baby/Toddler food"
+> "F-2113-2014 'Raspberry Sorbet': should be in the same category as
+> italian ice, popsicles -- I'm guessing that is Prepared/Frozen"
+> "H-1029-2026, H-0992-2026, etc. ... I read this as deli meats."
+
+Applied all five calls (27 rows patched; the other two flagged rows —
+"Gravy Beef" and "Substitute Turkey" — had already landed correctly, no
+change needed). Then a terse follow-up on the two deli trays with no
+named filling that I'd left `Uncategorized`:
+
+> "Categorized as a prepared food"
+
+Four words, unambiguous once the pattern was established — moved both to
+`Prepared/Frozen` and updated `CLASSIFICATION_RULES.md`'s boundary rule to
+match (unnamed-contents trays are a composite assortment, not a guess at
+a single-ingredient label). `CLASSIFICATION_RULES.md` picked up a v3
+revision entry closing the human-milk and sorbet doc gaps for any future
+re-run. Uncategorized: 231 -> 211 (0.72%) across the two commits.
+
+---
