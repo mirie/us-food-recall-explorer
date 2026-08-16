@@ -1,0 +1,19 @@
+{
+  "batches": [
+    {
+      "batch_id": "msgbatch_015K8biH1CtondHooZkywYHg",
+      "submission_index": 0,
+      "n_chunks": 98
+    },
+    {
+      "batch_id": "msgbatch_01LaQaAqoLNNCtwUwRtJwvsK",
+      "submission_index": 1,
+      "n_chunks": 97
+    },
+    {
+      "batch_id": "msgbatch_011XJNtZnCTBKVFk3XR2RAVH",
+      "submission_index": 2,
+      "n_chunks": 97
+    }
+  ]
+}

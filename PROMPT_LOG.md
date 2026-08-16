@@ -612,3 +612,17 @@ approval the master plan requires before the full run -- not decided
 unilaterally.
 
 ---
+
+## Session — Step 3: full run approved and submitted
+
+Mai's answers: effort level "High (~$29) (Recommended)", spend approval
+"Yes, proceed with the full run" (via AskUserQuestion, after reviewing the
+pilot's cost/accuracy table).
+
+Ran `classify_all.py submit` for real -- 29,159 rows, 292 chunks, 3 Batch
+API jobs. IDs committed to `data/batch_ids.json` immediately so they're
+recoverable even if this session ends before the batches finish
+processing (results retrievable from Anthropic for 29 days independent of
+any local process). Next step is `fetch` once all three batches end.
+
+---

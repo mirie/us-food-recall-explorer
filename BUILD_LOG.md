@@ -1479,3 +1479,37 @@ truncation bug, catching and correcting my own probe-labeling errors,
 clean re-run, cost/accuracy analysis.
 
 ---
+
+## Entry 20 — Phase 5 Step 3: full run submitted
+
+**Goal**
+Submit the full 29,159-row dataset for classification, per Mai's approval
+(effort: high, ~$29 estimated via the Batch API).
+
+**What I built**
+Ran `classify_all.py submit` for real. 292 chunks split across 3
+submissions (98/97/97), each a separate Batch API job:
+- `msgbatch_015K8biH1CtondHooZkywYHg` (98 chunks)
+- `msgbatch_01LaQaAqoLNNCtwUwRtJwvsK` (97 chunks)
+- `msgbatch_011XJNtZnCTBKVFk3XR2RAVH` (97 chunks)
+
+IDs written to `data/batch_ids.json`, committed immediately so they survive
+a lost session -- results stay retrievable from Anthropic for 29 days
+independent of this process. All three showed `in_progress` on the
+first status check immediately after submission.
+
+**What worked**
+Submission itself was clean -- no request-shape errors, matches the pilot's
+validated shape exactly (same system prompt, schema, chunking).
+
+**Open questions**
+None yet. Next: run `classify_all.py fetch` once all three batches show
+`processing_status == "ended"` (typically under an hour, up to 24h per
+Anthropic's SLA). `fetch` is safe to re-run -- it reports per-batch status
+and only writes the output CSV once all three have ended and the
+completeness check passes.
+
+**Time spent**
+~5 minutes (submission + status check).
+
+---
