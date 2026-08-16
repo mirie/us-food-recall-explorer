@@ -587,3 +587,28 @@ for Mai before the pilot runs, since the current completeness check
 wouldn't detect losing one of those two rows silently.
 
 ---
+
+## Session — Step 3: pilot run
+
+Mai's message: "go for it" (approving progression to Step 3's pilot after
+Step 2's checkpoint).
+
+Built a 255-row pilot (197 stratified + 58 regex-selected known-answer
+probes) and ran it at high/medium/low effort. First pass surfaced two real
+problems rather than clean results: a MAX_TOKENS truncation bug on
+high-effort chunks (fixed: 8000 -> 24000), and — caught only because Mai
+pushed back mid-analysis ("wait a minute... these are not correct
+categories. How should I read this output?") on a table of my own
+regex-guessed probe labels that I'd printed without yet stating they were
+wrong — roughly 20 of my 58 "known answers" were themselves incorrect
+(matched a keyword without confirming it was actually the product, e.g.
+"Olive Oil Cake" tagged Oils/Fats when it's a finished Bakery item).
+Manually re-verified all 58 against CLASSIFICATION_RULES.md, corrected 20,
+dropped 3 as genuinely ambiguous, re-ran high cleanly after the token fix.
+Final: 98.2%/100%/96.4% probe accuracy across high/medium/low, ~97-99%
+label agreement between levels, ~$23-31 extrapolated full-run cost via the
+Batch API depending on effort. Presenting to Mai for the effort-level/spend
+approval the master plan requires before the full run -- not decided
+unilaterally.
+
+---

@@ -44,7 +44,12 @@ from recall_explorer.llm_categories import CATEGORY_ENUM
 from recall_explorer.pipeline import load_recalls
 
 MODEL = "claude-opus-5"
-MAX_TOKENS = 8000
+# 8000 truncated a 100-row chunk at effort="high" during the Step 3 pilot --
+# adaptive thinking at high effort consumed most of the budget before any
+# response text, the same failure mode Step 1's design-sample call hit at
+# max_tokens=16000 (see BUILD_LOG). Sized generously since chunks (and their
+# thinking budgets) are per-request, not cumulative across the run.
+MAX_TOKENS = 24000
 CHUNK_SIZE = 100
 N_SUBMISSIONS = 3
 

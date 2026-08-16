@@ -1404,3 +1404,78 @@ regressions.
 ~15 minutes.
 
 ---
+
+## Entry 19 — Phase 5 Step 3: pilot run (high/medium/low effort)
+
+**Goal**
+Run the master plan's Step 3 pilot: ~250 rows (stratified + known-answer
+probes) at three effort levels, measure cost and accuracy, and bring Mai a
+recommendation before spending real money on the full 29,159-row run.
+
+**What I built**
+`scratch/build_pilot_sample.py` (not checked in): 197 proportionally-
+stratified rows + 58 known-answer probes (regex-matched against 17 product
+patterns -- shell eggs, romaine, bottled water, etc.), 255 rows total.
+`scratch/run_pilot.py` (not checked in): classifies the sample synchronously
+(not via Batch API -- iterating 3 effort levels serially mattered more here
+than the 50% batch discount) at `high`/`medium`/`low`, reusing
+`classify_all.py`'s exact request-shaping helpers so the pilot exercises the
+same system prompt, schema, and 100-row chunking shape production will use.
+
+**What broke**
+1. **`high`-effort chunk 1 truncated** (`stop_reason=max_tokens`) --
+   `MAX_TOKENS=8000` wasn't enough headroom for high-effort adaptive
+   thinking on a 100-row chunk. Same failure class as Step 1's design-sample
+   call hitting this at `max_tokens=16000`. Fixed by raising
+   `classify_all.py`'s `MAX_TOKENS` to 24000. Confirmed clean on a full
+   re-run of all 3 chunks at `high` (13,224 output tokens including
+   thinking, well under budget, all `end_turn`).
+2. **My own probe labels were wrong for ~20 of the 58 rows.** The regex
+   patterns matched a keyword without confirming the keyword was actually
+   the product -- e.g. `\bolive oil\b` tagged "Olive Oil Cake" (a finished
+   Bakery item) and "Oysters in Olive Oil" (packing medium, still
+   `Seafood`) as expected `Oils/Fats`; `\bhoney\b` tagged a "Honeydew" melon
+   mix as expected `Spices/Condiments`. Manually re-read all 58 full
+   descriptions against `CLASSIFICATION_RULES.md`, corrected 20 labels, and
+   dropped 3 as genuinely ambiguous (a 40-item multi-product recall notice;
+   a bean soup where the cooked-bean-dish rule and the soup-is-Prepared/
+   Frozen rule conflict with no doc resolution; one truncated/unreadable
+   description) -- 55 usable probes. Recorded in
+   `scratch/pilot_probes_corrected.py` with the reasoning for every
+   correction, not checked in.
+
+**Results (55 corrected probes, 255-row sample)**
+
+| Effort | Probe accuracy | Agreement w/ high | Pilot cost | Extrapolated full run (Batch API, 50% off) |
+|---|---|---|---|---|
+| high | 54/55 (98.2%) | -- | $0.51 | ~$29 |
+| medium | 55/55 (100%) | 97.6% | $0.54 | ~$31 |
+| low | 53/55 (96.4%) | 98.8% | $0.40 | ~$23 |
+
+The two genuine misses: `F-2292-2012` (a vegan meal-replacement shake,
+explicitly labeled "Dietary supplement" -- the model called it `Plant
+Protein`, likely pulled by its "plant nutrition" branding language despite
+squarely matching the `Supplements` rule) missed at both `high` and `low`;
+`F-0684-2013` ("Whole Foods Meal Shrimp Stir Fry," a defensible boundary
+case between protein-dominant and composite-meal) missed only at `low`.
+Neither looks like a broken prompt -- both are plausible, explainable edge
+cases, and medium's 100% on the same set suggests the differences across
+effort levels are within noise at n=55, not a real quality gradient.
+
+**What I changed**
+`classify_all.py`: `MAX_TOKENS` 8000 -> 24000, with a comment explaining why.
+
+**Open questions**
+Effort level and full-run spend approval -- Mai's call per the master
+plan's explicit Step 3 gate, not decided here. Cost via the Batch API (what
+production will actually use) is close across all three levels (~$23-31)
+relative to the total project; the bigger differentiator so far is output
+token volume (high 13,224 vs. low 9,062 for the same 255 rows), not
+accuracy.
+
+**Time spent**
+~70 minutes: sample construction, first pilot pass, catching and fixing the
+truncation bug, catching and correcting my own probe-labeling errors,
+clean re-run, cost/accuracy analysis.
+
+---
